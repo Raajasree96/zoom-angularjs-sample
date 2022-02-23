@@ -1,0 +1,120 @@
+
+<div class="row board-container">
+  <div class="white-board w-100">
+    <!--.alert(ng-class='alert.class', role='alert', ng-show='alert.isVisible', ng-bind='alert.message | sentence', ng-style="{'width':alertWidth}")-->
+    <div class="row">
+      <div class="title-bar">
+        <div class="sd-container whiteboard-handle">
+          <div class="w-tabs">
+            <p><span data-id="rp-whiteboard-default" ng-mousedown="(user.role == 'teacher') ? toggleTabMenu() : '' " ng-class="{ active : (user.role == 'teacher') }" class="current-board">{{ activeBoard.label | characters:25 : false }}<i ng-if="user.role == 'teacher'" data-id="rp-whiteboard-dropdown" class="dc-icon dc-dc-menu-arrow-down pull-right"></i></span></p>
+            <ul id="wb-tab" tabindex="-1" ng-blur="closeTabMenu();" ng-show="showTabMenu" class="w-tabs-area list-unstyled">
+              <li data-id="" ng-mousedown="(user.role == 'teacher') ? openTab($index) : false" ng-class="{active : collection.activeBoard==$index, 'control-disabled' : disableControls}" ng-repeat="board in collection.boards" class="animated"><a data-id="rp-ppt-tab-{{$index}}" tabindex="-1" href="#" title="{{board.label}}" class="white-board-tab d-flex justify-content-between align-items-center"><span data-ng-bind-template="{{ board.label }}"></span><i data-id="tab-close{{$index}}" id="tab-close{{$index}}" ng-mousedown="closeTab($index, $event);" ng-if="user.role =='teacher'" class="dc-icon dc-close pull-right"></i></a></li>
+              <li id="button-root" ng-if="collection.boards.length &lt; 4"><a id="addButton" href="#" class="d-flex justify-content-between align-items-center" ng-class="{ 'control-disabled' : disableControls }" ng-mousedown="addTab()">Add new Whiteboard<i class="dc-icon dc-plus pull-right"></i></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wbContainer">
+      <div class="container-fluid cHeight">
+        <div class="row no-padding wbContent">
+          <div class="col-2 col-sm-2 col-md-2">
+            <div style="height: 100%;">
+              <div id="ppt-side-panel" data-id="rp-side-panel" ng-hide="{{$parent.user.role === 'student'}}" class="slides side-panel d-flex">
+                <div class="preview">
+                  <div ng-show="activeBoard.mount.activePanel == 'thumbnails'">
+                    <!--h4 Outline-->
+                    <div id="thumbnail-container" ng-class="{ 'control-disabled' : disableControls }" class="previewPanel">
+                      <div id="wrapper" ng-iscroll="wrapper" ng-iscroll-delay="1000" ng-iscroll-form="true" class="iscroll-wrapper">
+                        <div id="scroller" class="iscroll-scroller">
+                          <ul id="thumbnail-list" class="thumbnail-list list-unstyled">
+                            <li ng-repeat="thumb in activeBoard.mount.thumbs" ng-class="{active: $index == activeBoard.mount.activeSlide}" id="slide-{{$index}}" class="text-center">
+                              <div ng-click="activeBoard.mount.gotoSlide($index)"><img ng-src="{{thumb}}"/><span data-id="slide-no" class="text-center">{{$index + 1}}</span>{{ updateScroll() }}
+                                {{resizeThumbnail()}}
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="info-area" ng-hide="{{$parent.user.role === 'student'}}" class="info-bar">
+                    <div class="align-items-center d-flex justify-content-between"><span data-id="rp-prev-slide" ng-class="{ 'disabled' : (activeBoard.mount.activeSlide==0) }" ng-click="activeBoard.mount.prevSlide()" class="col-sm-5 btn btn-hdr-primary mute pull-left"><i class="dc-icon dc-arrow-left"></i></span><span data-id="rp-next-slide" ng-class="{ 'disabled' : (activeBoard.mount.activeSlide==activeBoard.mount.slides.length-1) }" ng-click="activeBoard.mount.nextSlide()" class="col-sm-5 pull-right btn btn-hdr-primary mute pull-right"><i class="dc-icon dc-right-arrow"></i></span>
+                      <!--.controls(ng-class="{ 'control-disabled' : disableControls }")
+                      ul
+                        li: span(ng-click="activeBoard.mount.prevSlide()")
+                          i.dc-icon.dc-more-left
+                        li.drop-down
+                          div.input-group
+                            input.form-control(ng-value="activeBoard.mount.activeSlide + 1", ng-keydown="isValidSlide($event)", ng-blur="resetValidSlide($event)",id="slideChangeInput")
+                            button.btn.btn-default.dropdown-toggle(type='button', ng-mousedown="toggleSlideMenu($event)")
+                              span.caret
+                              span.sr-only Toggle Dropdown
+                            ul.dropdown-menu.dropdown-menu-right#dropdown-slide-menu(role='menu', ng-class="{show: slideMenuVisibility}", tabindex="1", ng-click="toggleSlideMenu($event)", ng-blur="slideMenuVisibility = 0")
+                              li(ng-repeat="slide in activeBoard.mount.slides" id="ppt-navigator-{{$index}}" ng-click="activeBoard.mount.gotoSlide($index)") {{$index+1}}
+                        li.dropdown-count: span /{{activeBoard.mount.slides.length}}
+  
+  
+                        li: span(ng-click="activeBoard.mount.nextSlide()")
+                          i.dc-icon.dc-more-right
+  
+                      -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-8 col-sm-8 col-md-8">
+            <div id="conResize" style="height: 100%; width: 100%; padding-top: 15px; padding-bottom: 15px;">
+              <div id="viewport" ng-class="animationEffect.board" class="sd-container area animated">
+                <alert-notifications></alert-notifications>
+                <div id="content-area" ng-class="{ 'hd_ppt' : activeBoard.mount.layout == '16:9'}" class="content-area">
+                  <div ng-if="imgRendered==false" class="loader_new">
+                    <div class="loader"></div>
+                  </div>
+                </div>
+                <div ng-click="advanceSlideAnimation();"
+                     title="Next Step/Slide"
+                     ng-show="activeBoard.type == 'ISPRING' && user.role=='teacher'"
+                     ng-class="{ 'control-disabled' : (disableControls || (activeBoard.mount.activeSlide == (activeBoard.mount.slides.length - 1))) }"
+                     class="advance-slide-animation">
+                  <i class="dc-icon dc-fast-forward-control-arrow"></i>
+                </div>
+                <div id="draw-area" ng-class="{watermark:activeBoard.type=='BLANK'}" class="draw-area">
+                  <div id="textbox">
+                    <textarea id="textbox-input" wrap="soft"></textarea>
+                  </div>
+                  <canvas id="bg-canvas"></canvas>
+                  <canvas id="fg-canvas" ng-class="mouseIcon.icon"></canvas>
+                  <canvas id="ghost-canvas"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-if="activeBoard.mount.layout == '4:3'" class="col-xs-2"></div>
+        </div>
+      </div>
+    </div>
+    <div ng-show="(activeBoard.mount && activeBoard.type=='ISPRING' && activeBoard.mount.slides[activeBoard.mount.activeSlide].notes != '' && user.role=='teacher')" ng-class="{'fadeInRight':(activeBoard.mount && activeBoard.mount.slides[activeBoard.mount.activeSlide].notes != '' && showNotesPanel) , 'fadeOutRight':!(activeBoard.mount && activeBoard.mount.slides[activeBoard.mount.activeSlide].notes != '' && showNotesPanel)}" class="notesControls col-3 animated">
+      <h5 data-id="rp-notes-title">NOTES</h5>
+      <div class="font-buttons">
+        <span data-id="rp-font-decrease" ng-click="adjustFont($event,'decrease')" ng-class="{'current-active' : fontAction=='decrease'}" class="dc-font-decrease"></span>
+        <span data-id="rp-font-default" ng-click="adjustFont($event,'default')" ng-class="{'current-active' : (fontAction =='default' || !fontAction )}" class="dc-font-default"></span>
+        <span data-id="rp-font-increase" ng-click="adjustFont($event,'increase')" ng-class="{'current-active' : fontAction=='increase'}" class="dc-font-increase"></span>
+      </div>
+    </div>
+    <div id="notesPanel" ng-show="(activeBoard.mount && activeBoard.type=='ISPRING' && activeBoard.mount.slides[activeBoard.mount.activeSlide].notes != '' && user.role=='teacher')" ng-class="{'fadeInRight':(activeBoard.mount && activeBoard.mount.slides[activeBoard.mount.activeSlide].notes != '' && showNotesPanel) , 'fadeOutRight':!(activeBoard.mount && activeBoard.mount.slides[activeBoard.mount.activeSlide].notes != '' && showNotesPanel)}" class="col-3 animated">
+      <div data-id="rp-notes" class="notes">
+        <div id="wrapperNotes" ng-class="{'increase' : fontAction=='increase', 'decrease': fontAction=='decrease' }" ng-iscroll="wrapperNotes" ng-iscroll-delay="1000" style="overflow: hidden;" ng-iscroll-form="true" class="iscroll-wrapper">
+          <p ng-bind-html="activeBoard.mount.slides[activeBoard.mount.activeSlide].notes | to_trusted" class="iscroll-scroller"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="extra-menus">
+    <div ng-if="user.role == 'teacher'" title="Assessments" class="assessment"><a href="#" data-toggle="modal" ng-click="toggleAssessment(); closeToolset()" class="icon-wrapper"><i data-id="rp-trigger-file-import" class="dc-icon dc-assessment_icon"></i></a></div>
+    <div ng-class="{ 'control-disabled' : disableControls }" ng-attr-title="{{ (disableControls == false) ? 'Import File' : '' }}" ng-if="user.role == 'teacher'" class="file-upload"><a href="#" data-toggle="modal" ng-click="toggleExplorer(); closeToolset()" class="icon-wrapper"><i data-id="rp-trigger-file-import" class="dc-icon dc-files"></i></a></div>
+    <div ng-if="user.role == 'teacher'" ng-show="(activeBoard.mount && activeBoard.type=='ISPRING')" ng-attr-title="{{ (activeBoard.mount && activeBoard.mount.slides[activeBoard.mount.activeSlide].notes != '') ? 'Notes' : '' }}" class="notes-menu"><a href="#" ng-click="toggleNotespanel();" ng-class="{'active':(activeBoard.mount && activeBoard.mount.slides[activeBoard.mount.activeSlide].notes != '')&&showNotesPanel}" class="icon-wrapper"><i data-id="new-notes" class="dc-icon dc-new-notes"></i></a></div>
+  </div>
+</div>

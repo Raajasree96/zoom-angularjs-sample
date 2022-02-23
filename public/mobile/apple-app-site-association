@@ -1,0 +1,11 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "RZFPK52WDQ.com.pearson.wallstreetenglish.dc",
+                "paths": ["/autologin", "/diagnostics"]
+            }
+        ]
+    }
+}

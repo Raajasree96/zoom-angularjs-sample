@@ -1,0 +1,17 @@
+
+<div class="row col-xs-12">
+  <div style="background: #fff; margin-top: 50px; padding-bottom: 50px" ng-init="currentView.view = 'mobile'" class="mobilequickslot container col-md-8 col-md-offset-2 col-xs-offset-1 col-xs-11">
+    <h3 class="text-center">MOBILE - QUICK SLOT</h3>
+    <div class="text-center"><a ng-click="generateQuickslotURL('web')" ng-show="showButton" class="btn btn-primary">Generate URLs</a>
+      <p ng-if="showLoader">Loading...</p>
+    </div>
+    <div ng-if="teacherLink" class="quickslot-links-container">
+      <p ng-if="teacherLink" class="quick-link"><strong>Teacher link: </strong><a ng-href="{{teacherLink}}" target="_blank" class="quickslot-links">{{teacherLink}}</a>
+        <!--span(ng-bind="teacherLink")-->
+      </p>
+      <p ng-repeat="studentLink in studentLinks" class="quick-link"><strong>Student {{$index + 1}}: </strong><a ng-href="{{studentLink}}" target="_blank" class="quickslot-links">{{studentLink}}</a>
+        <!--span(ng-bind="studentLink")-->
+      </p>
+    </div>
+  </div>
+</div>

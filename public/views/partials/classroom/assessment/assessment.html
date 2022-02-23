@@ -1,0 +1,130 @@
+
+<div ng-show="displayAssessment" ng-class="{'mdshow animated customZoomIn' : displayAssessment,'otherClassContainer':!encounterFeedback}" class="assessment-container no-padding cms-wrapper md-modal md-effect-2 col-12 col-md-10 offset-1 m-auto content-holder">
+  <div ng-if="encounterFeedback" class="row">
+    <div class="col-12 content-holder"><i ng-click="closeAssessment();" class="dc-icon dc-close close"></i>
+      <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10 pl-0">
+          <div class="row">
+            <div class="col-2"></div>
+            <div class="col-10 md-header">
+              <div ng-repeat="user in users" class="grade-wrapper">
+                <div class="profilePicHolder"><img ng-src="{{ user.photoUri ? user.photoUri : null }}" ng-if="user.photoUri !== null"/>
+                  <div ng-if="user.photoUri === null" class="userName"><span>{{(user.firstName | firstletter ) + (user.lastName | firstletter)}}</span></div><span>{{user.firstName}} {{user.lastName}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-show="encounterFeedback" class="md-body col-12 no-padding">
+    <div class="question-container row">
+      <div class="col-1"></div>
+      <div class="col-10 no-padding">
+        <div class="clearfix row">
+          <div class="topics col-2">
+            <div ng-repeat="topics in classSkills" class="topics-item">
+              <div class="heading clearfix">
+                <h3>Part {{$index + 1}}</h3>
+              </div>
+              <div ng-repeat="subTopics in topics.ratingSchemaPartItems" class="questions">
+                <div ng-class="{'showTooltip':hovering}" ng-mouseenter="hovering=true" ng-mouseleave="hovering=false">{{subTopics.name}}</div>
+                <div ng-show="hovering" class="tool-tip">
+                  <div class="question-name">{{subTopics.name}}</div>
+                  <div ng-repeat="helpText in subTopics.formattedHelpText" class="question-help-text">{{helpText}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-repeat="user in users" ng-init="outerIndex=$index" class="userData">
+            <div ng-repeat="topic in results[user.lsId].partialResults" class="topic">
+              <div ng-repeat="subTopic in topic" class="grade-wrapper">
+                <div data-rating="4" ng-click="classEncounterPartialResults($index, outerIndex, topic, results[user.lsId], 4)" ng-class="{'active': getRating(subTopic) == 4}" class="grade-holder box4"></div>
+                <div data-rating="3" ng-click="classEncounterPartialResults($index, outerIndex, topic, results[user.lsId], 3)" ng-class="{'active': getRating(subTopic) == 3}" class="grade-holder box3"></div>
+                <div data-rating="2" ng-click="classEncounterPartialResults($index, outerIndex, topic, results[user.lsId], 2)" ng-class="{'active': getRating(subTopic) == 2}" class="grade-holder box2"></div>
+                <div data-rating="1" ng-click="classEncounterPartialResults($index, outerIndex, topic, results[user.lsId], 1)" ng-class="{'active': getRating(subTopic) == 1}" class="grade-holder box1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div ng-show="!displaySpinner" class="score_result row mt-3">
+          <div class="col-2 clearfix no-padding">
+            <h3>Score</h3>
+            <h3 class="result">Result</h3>
+          </div>
+          <div class="col-10 pl-0 score_details">
+            <div ng-repeat="user in users" ng-if="user.role!='teacher'" class="action-holder">
+              <div class="score-holder mt-0 px-2">
+                <h3 class="score mt-0"><span ng-class="{'nt-enough-data': !results[user.lsId].score, 'marks-obtained': results[user.lsId].score }">{{results[user.lsId].score || "Not enough data"}}</span><span ng-class="{'nt-enough-data': !results[user.lsId].score, 'marks-obtained': results[user.lsId].score }" ng-show="results[user.lsId].score &amp;&amp; results[user.lsId].score != 'Not enough data'">{{"%"}} </span></h3>
+              </div>
+              <div class="as-feedback">
+                <p ng-click="getFeedback(true, user);"><span ng-show="results[user.lsId].comments.length">Edit Feedback</span><span ng-show="!results[user.lsId].comments || results[user.lsId].comments.length===0">Add Feedback </span></p>
+              </div>
+              <div class="as-continue">
+                <p ng-click="toggleResultType(user, $event)" class="continue">{{ results[user.lsId].result.label || 'Result'}}<i class="dc-icon dc-down-arrow-m"></i></p>
+                <ul ng-show="user.lsId == selectedUserResultType" class="dropup-options">
+                  <li ng-repeat="resultType in resultTypes" ng-click="selectEncounterResultType(resultType, results, user.lsId); toggleResultType(user, false);">{{resultType.label}} </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="row action-button">
+          <div class="col-4 clearfix no-padding"></div>
+          <div class="col-4 finish-button">
+            <button ng-click="closeEncounter();" ng-if="!isClosed" ng-show="!displaySpinner" class="btn btn-hdr-primary finish active">Finish Class</button>
+          </div>
+          <div class="col-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-if="!encounterFeedback" class="otherClass">
+    <div class="col-12 otherClassHolder"><i ng-click="closeAssessment();" class="dc-icon dc-close close">
+        <div class="otherClassHeader"></div></i>
+      <div class="contentContainer">
+        <div ng-repeat="user in users" class="otherClassColumn">
+          <div class="profileHolder">
+            <div class="profilePicture"><img ng-src="{{ user.photoUri ? user.photoUri : null }}" ng-if="user.photoUri !== null"/>
+              <div ng-if="user.photoUri === null" class="userName"><span>{{(user.firstName | firstletter ) + (user.lastName | firstletter)}}</span></div><span>{{user.firstName}} {{user.lastName}}</span>
+            </div>
+          </div>
+          <div ng-click="getFeedback(true, user);" class="feedbackHolder">
+            <textarea id="feedback-box" placeholder="Add Feedback" ng-model="results[user.lsId].comments" disabled="disabled"></textarea>
+          </div>
+          <div class="attendanceHolder">
+            <div class="attendanceBox">
+              <h3>Attendance</h3>
+              <div class="as-continue ndropdown">
+                <p ng-click="toggleResultType(user, $event)" class="continue toggle-result-type ndropdown-label">{{results[user.lsId].result.label || 'Select'}}<i class="dc-icon dc-down-arrow-m drop-down-arrow ndropdown-arrow"></i></p>
+                <ul ng-show="user.lsId == selectedUserResultType" class="dropup-options non-enc-attendance ndropdown-list">
+                  <li ng-repeat="resultType in resultTypesNonEncounter" ng-click="selectNonEncounterResultType(resultType, results, user); toggleResultType(user, false);">{{resultType.label}} </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="buttonHolder">
+        <button ng-show="!isClosed &amp;&amp; !displaySpinner" ng-click="closeNonEncounter()" class="btn btn-hdr-primary save">Finish Class</button>
+      </div>
+    </div>
+  </div>
+  <div ng-if="displaySpinner" class="loaderWrap">
+    <div class="assessmentSpinner"></div>
+  </div>
+</div>
+<div class="md-overlay"></div>
+<div ng-show="showFeedbackpopup" ng-class="{'mdshow animated fadeInleft' : showFeedbackpopup}" class="feedback-container m-auto md-effect-2 col-12 cms-wrapper md-modal"><i ng-click="getFeedback(false);" class="dc-icon dc-close close"></i>
+  <h3>Feedback for {{feedBackInfo.name}}</h3>
+  <textarea id="feedback-input" ng-model="feedBackInfo.comments"></textarea>
+  <div class="botton-action">
+    <button ng-click="getFeedback(false);" class="md-close btn btn-default button-2">Cancel</button>
+    <button ng-click="updateFeedback()" class="btn btn-hdr-primary submit">Submit</button>
+  </div>
+</div>
+<div class="md-overlay"></div>

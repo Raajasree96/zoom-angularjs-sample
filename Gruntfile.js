@@ -101,6 +101,22 @@ module.exports = function (grunt) {
                 ]
             }
         },
+        copy: {
+			main: {
+				files: [{
+					cwd: 'node_modules/@zoom/videosdk/dist/lib',
+					src: ['*'],
+					dest: 'public/scripts/zoom-libs',
+					expand: true
+				}, {
+					cwd: 'node_modules/@zoom/videosdk/dist/',
+					src: ['index.umd.js'],
+					dest: 'public/scripts/zoom',
+					expand: true
+				}
+				]
+			}
+		},
         protractor: {
             options: {
                 configFile: 'protractor.conf.js'
@@ -127,5 +143,5 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('default', ['jshint:all', 'jscs:all', 'karma:singleRun', 'concat', 'uglify:concat']);
+    grunt.registerTask('default', ['jshint:all', 'jscs:all', 'karma:singleRun', 'concat', 'copy', 'uglify:concat']);
 };

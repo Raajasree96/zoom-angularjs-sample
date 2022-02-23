@@ -1,0 +1,62 @@
+
+<div class="row col-md-12">
+  <!-- <div class="auth-popup-container" ng-show="showAuthPopup">
+
+    <input type="text" name="" value="" placeholder="Enter the key">
+    <i class="dc-close" ng-click="closeAuthPopup()"></i>
+  </div> -->
+
+  <div class="auth-popup-container">
+    <div id="myModal" class="modal-for-auth-key" ng-show="quickslotController.showAuthPopup">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Provide the key to view Reports</h2>
+          <span>
+            <i class="dc-close" ng-click="quickslotController.closeAuthPopup()"></i>
+          </span>
+        </div>
+
+        <div class="modal-body">
+          <input type="password" placeholder="Enter the auth key" ng-model="quickslotController.reportsAuthKey" autofocus>
+          <div class="" ng-show="quickslotController.showInvalidKeyError" style="color: #e40f0f">
+            Please Provide Valid Key
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" name="button" class="proceed-button" ng-click="quickslotController.showReports()">Proceed</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: #fff; margin-top: 50px; padding-bottom: 50px;" class="container col-md-8 col-md-offset-2 quickslot-parent-container">
+    <div class="reports-link">
+      <a ng-click="quickslotController.verifyAuthentication()">Session Reports</a>
+    </div>
+    <!-- <div class="reports-link">
+      <a ng-click="quickslotController.showOnlineMaterials()">materials</a>
+    </div> -->
+    <h3 class="text-center">QUICK SLOT</h3>
+    <div id="technology-selection">
+      <label for="technology-selection">Technology</label>
+      <select name="technology-selection" ng-model="quickslotController.rtcServiceProvider">
+        <option value="opentok">OpenTok</option>
+        <option value="enablex">EnableX</option>
+        <option value="zoom">Zoom</option>
+      </select>
+    </div>
+    <div class="text-center"><a ng-click="quickslotController.generateQuickslotURL('web')" ng-show="quickslotController.showButton" class="btn btn-primary">Generate URLs</a>
+      <p ng-if="quickslotController.showLoader">Loading...</p>
+    </div>
+    <div ng-if="quickslotController.teacherLink" class="quickslot-links-container">
+      <p ng-if="quickslotController.teacherLink" class="quick-link"><strong>Teacher link: </strong><a ng-href="{{quickslotController.teacherLink}}" target="_blank" class="quickslot-links">{{quickslotController.teacherLink}}</a>
+        <!--span(ng-bind="teacherLink")-->
+      </p>
+      <p ng-repeat="studentLink in quickslotController.studentLinks" class="quick-link"><strong>Student {{$index + 1}}: </strong><a ng-href="{{studentLink}}" target="_blank" class="quickslot-links">{{studentLink}}</a>
+        <!--span(ng-bind="studentLink")-->
+      </p>
+    </div>
+  </div>
+</div>

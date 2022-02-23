@@ -1,0 +1,196 @@
+<div brand-header="brand-header"></div>
+<!-- <div brand-header></div> -->
+<div data-ng-switch="diagnosticsController.diagnosticsPage" ng-class="{'fade-page': fadePage}" class="container-fluid diagnostic" ng-click="diagnosticsController.diagnosticsWindowClick()">
+  <!-- --------------------------------->
+  <!-- OS INCOMPATIBLE - ANDROID - APP-->
+  <!-- --------------------------------->
+  <div data-ng-switch-when="Android" class="col-xs-12 mobile_unsupport">
+    <div class="unsupport_container app-installed col-sm-offset-3 col-sm-6 col-xs-offset-1 col-xs-10">
+      <div class="logo-wrapper">
+        <div class="app-logo">
+          <div class="dc-app-logo"><a ng-href="{{diagnosticsController.ahref}}"><img src="/images/ic_launcher.png"/></a></div>
+          <p>Click here to launch the app</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ----------------------->
+  <!-- OS INCOMPATIBLE - IOS-->
+  <!-- ----------------------->
+  <div data-ng-switch-when="iOS" class="col-xs-12 mobile_unsupport">
+    <div class="unsupport_container ios col-sm-offset-3 col-sm-6 col-xs-offset-1 col-xs-10">
+      <h3 class="text-center">Something went wrong!</h3>
+      <div class="unspport text-center">
+        <p>We are not supporting mobile browser</p>
+      </div>
+      <h5 class="text-center">Download app from store</h5>
+      <div class="logo-wrapper">
+        <div class="app-logo">
+          <div class="mobile_icon">
+            <div class="ios"><a href="https://itunes.apple.com/us/app/digital-classroom-by-wse/id1239330133?ls=1&amp;mt=8"> <img src="images/app-store-logo.png" class="app-store"/></a></div><span>App Store</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ------------>
+  <!-- CROSS TABS-->
+  <!-- ------------>
+  <div data-ng-switch-when="cross-tabs" class="block-wrapper">
+    <div class="instruction-container">
+      <div class="row">
+        <div class="col-sm-4 instruction_box">
+          <div class="text-center mbottom_20 animated flipInX"><span class="inblock"></span><i class="dc-icon dc-wondering"></i></div>
+          <h2 class="text-center animated flipInX">App Already Running!</h2>
+          <p class="text-center animated slideInDown">Digital Classroom is already running in another tab. Please close this tab and continue using in the previously opened tab.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- --------------->
+  <!-- DEVICE STATUS-->
+  <!-- --------------->
+  <div data-ng-switch-when="device-check" class="row block-wrapper device-block-wraper">
+    <div ng-show="!diagnosticsController.sessionConnected" class="system-devices col-md-3 dc_video_block establish">
+      <p>Establishing connection. Please wait...</p>
+    </div>
+
+    <div data-id="rp-diagnosticsScreen" class="system-devices dc_video_block" ng-if="diagnosticsController.showDiagnosticsPopup">
+      <h3 class="diagnostic-title">Get ready</h3>
+
+      <div class="device-notification animated fadeInDown" ng-if="diagnosticsController.deviceErrorNotification">
+        <span ng-if="diagnosticsController.activeVideoDevice != '' && diagnosticsController.activeAudioDevice == ''">Microphone not connected</span>
+        <span ng-if="diagnosticsController.activeAudioDevice != '' && diagnosticsController.activeVideoDevice == ''">Camera not connected</span>
+        <span ng-if="diagnosticsController.activeAudioDevice == '' && diagnosticsController.activeVideoDevice == ''">Devices not found</span>
+      </div>
+
+      <div class="test-stream camera-preview-video">
+
+        <div class="ot-wrapper" id="ot-publisher-video-container">
+        </div>
+
+        <div ng-if="diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom && diagnosticsController.isPreCallTestRunning == true" class="text-center mt-3">
+          <p class=""><b>Checking your internet speed</b></br> It may take upto one minute. Please standby.</p>
+          <div class="loader-section mt-4">
+            <svg class="loader" viewBox="25 25 50 50">
+              <circle class="loader-path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Audio only designed for Enablex can be reused if needed in future -->
+        <!-- <div ng-show="diagnosticsController.isAudioOnly" class="warning-box text-center p-1 mb-4">
+          <div class="margin-auto p-1">
+            <i class="dc-large-icon dc-slow-net"></i> 
+          </div>
+          <div class="text-center">
+            <p class="warning-box-desc mb-1"><b>Audio only</b></p>
+            <p class="warning-box-desc">Your internet connection is too slow to see other Students. Your audio is on. You will only see the Teacher's video</p>
+          </div>
+        </div> -->
+
+        <video ng-if="diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom" id="localVideo" element-ready="local-stream-player" autoplay="" width="160" height="120"></video>
+
+        <div class="no-video-wrapper"
+             ng-show="!diagnosticsController.activeVideoDevice || diagnosticsController.showAvatar"
+             ng-class="{'offline' : !diagnosticsController.user.online, 'show-avatar': !diagnosticsController.user.camEnabled || diagnosticsController.showAvatar }"
+        >
+          <div class="profile-photo"
+              ng-class="{diagnosticsDp: diagnose == 'true'}">
+            <img ng-src="{{diagnosticsController.user.photoUri}}" ng-if="diagnosticsController.user.photoUri != null">
+            <div class="username-substring" ng-show="diagnosticsController.user.photoUri == null">
+              <span>{{(diagnosticsController.user.firstName | firstletter) + (diagnosticsController.user.lastName | firstletter)}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="audio-level-meter" ng-show="diagnosticsController.activeAudioDevice && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.opentok">
+          <ul data-id="rp-audio-indicators" class="audio-indicators" style="list-style-type: none">
+            <li ng-class="{active:diagnosticsController.audioValues.level > 0.99 && diagnosticsController.audioValues.userId == diagnosticsController.user.id}">
+            </li>
+            <li ng-class="{active:diagnosticsController.audioValues.level > 0.66 && diagnosticsController.audioValues.userId == diagnosticsController.user.id}">
+            </li>
+            <li ng-class="{active: (diagnosticsController.audioValues.level > 0.33 && diagnosticsController.audioValues.userId == diagnosticsController.user.id)}">
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="system-device" tabIndex="-1" ng-class="{'device-error': !diagnosticsController.activeAudioDevice}">
+        <div ng-click="diagnosticsController.toggleDevices('mic')" ng-class="{open: diagnosticsController.toggleCameraOptions}" class="current-device-wrapper d-flex dropdown">
+          <i class="dc-icon dc-mic pull-left device-icon"> </i>
+          <span class="device-current"> {{diagnosticsController.activeAudioDevice.label}} </span>
+          <i class="dc-icon dc-updown-caret pull-right"></i>
+          <ul ng-show="diagnosticsController.toggleMicOptions" class="dropdown-menu device-list">
+            <li ng-repeat="device in diagnosticsController.audioInputDevices" ng-click="diagnosticsController.getSelectedDevice(device)">
+              <a class="dropdown-item"> {{device.label}} </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Hide this when isAudioOnly true -->
+      <div class="system-device" tabIndex="-1" ng-class="{'device-error': !diagnosticsController.activeVideoDevice}">
+        <div ng-click="diagnosticsController.toggleDevices('camera')" ng-class="{open: diagnosticsController.toggleCameraOptions}" class="current-device-wrapper d-flex dropdown">
+          <i class="dc-icon dc-video pull-left device-icon"> </i>
+          <span class="device-current"> {{diagnosticsController.activeVideoDevice.label}} </span>
+          <i class="dc-icon dc-updown-caret pull-right"></i>
+          <ul ng-show="diagnosticsController.toggleCameraOptions" class="dropdown-menu device-list">
+            <li ng-repeat="device in diagnosticsController.videoInputDevices" ng-click="diagnosticsController.getSelectedDevice(device)">
+              <a class="dropdown-item"> {{device.label}} </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div sample-audio="sample-audio" page="diagnostics" class="audio-link"></div>
+
+      <div class="continue-wrapper">
+        <!-- The continue button is disabled in enablex when 
+          1. Device Permission is not given
+          2. When precall test api is running
+          3. When the total students inside the room is equal to or more than 8
+         -->
+        <div href="#" data-id="rp-continue" data-ng-click="diagnosticsController.preCheckBeforeJoiningClass()"
+          ng-class="{ 'control-disabled': diagnosticsController.disableContinue || ( diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom && diagnosticsController.isContinueDisabledEnablex()) }"
+          disable-right-click="disable-right-click" class="btn btn-primary button-2">Continue</div>
+      </div>
+
+      <div ng-if="diagnosticsController.currentBrowser === 'chrome' && diagnosticsController.deviceErrorNotification && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom"
+        ng-hide="diagnosticsController.isTotalStudentLimitReached && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom"
+        class="session-timing">
+        <p class="text-center text-danger">The Digital Classroom needs to use both your Camera and Microphone.</p>
+        <p class="text-center text-danger">Please allow Chrome to use your Microphone and Camera by clicking on Video / Mic icon at the end of the URL bar.</b></p>
+      </div>
+
+      <div ng-if="diagnosticsController.currentBrowser === 'firefox' && diagnosticsController.deviceErrorNotification && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom"
+        ng-hide="diagnosticsController.isTotalStudentLimitReached && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom" 
+        class="session-timing">
+        <p class="text-center text-danger">The Digital Classroom needs to use both your Camera and Microphone.</p>
+        <p class="text-center text-danger">Please allow Firefox to use your Microphone and Camera by clicking on Video / Mic icon on left side of the URL bar.</b></p>
+      </div>
+
+      <div ng-if="(diagnosticsController.currentBrowser === 'safari' || diagnosticsController.currentBrowser === 'unknown') && diagnosticsController.deviceErrorNotification && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom"
+        ng-hide="diagnosticsController.isTotalStudentLimitReached && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom" class="session-timing">
+        <p class="text-center text-danger">The Digital Classroom needs to use both your Camera and Microphone.</p>
+        <p class="text-center text-danger">Please allow your Browser to use your Microphone and Camera</b></p>
+      </div>
+
+      <div ng-if="diagnosticsController.isTotalStudentLimitReached && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom" class="session-timing">
+        <p class="text-center text-danger">The class is full.</p>
+        <p class="text-center text-danger">Please contact your center to reschedule.</b></p>
+      </div>
+
+      <div ng-if="diagnosticsController.isRoomCountApiError && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom" class="session-timing">
+        <p class="text-center text-danger">Something went wrong. Please Refresh</p>
+      </div>
+
+      <div ng-show="diagnosticsController.disableContinue" class="session-timing">
+        <!-- Hide the session remaining details if the class is full. -->
+        <p ng-if="diagnosticsController.waitSeconds &gt;= 60" class="text-center" ng-hide="diagnosticsController.isTotalStudentLimitReached && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom">Session starts in <b>{{diagnosticsController.remainingTime}}</b> minutes. Please wait.</p>
+        <p ng-if="diagnosticsController.waitSeconds &lt; 60 &amp;&amp; diagnosticsController.waitSeconds &gt; 0" class="text-center" ng-hide="diagnosticsController.isTotalStudentLimitReached && diagnosticsController.appData.rtcServiceProvider === diagnosticsController.RTC_PROVIDER.zoom">Session starts in <b>{{ diagnosticsController.waitSeconds }}</b> seconds. Please wait.</p>
+      </div>
+    </div>
+  </div>
+</div>

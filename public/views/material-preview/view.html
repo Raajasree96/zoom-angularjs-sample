@@ -1,0 +1,119 @@
+<div class="title-block">
+  <h1
+    style="
+      font-family: 'Proxima Nova Semi-bold' !important;
+      font-size: 28px;
+      color: #1a1a1a;
+      height: 34px;
+      font-weight: normal;
+    "
+  >
+    Online Classroom Materials
+  </h1>
+</div>
+<div class="online-material-view-page">
+  <div class="breadcrum">
+    <span ng-click="onlineMaterialViewCtrl.redirectBack()">
+      <i class="dc-icon dc-arrow-left"></i>
+      <a>Back to list</a>
+    </span>
+    <h4>{{onlineMaterialViewCtrl.selectedMaterial.title}}</h4>
+  </div>
+  <div class="online-material-wrapper">
+    <div class="thumbnail-panel">
+      <div class="thumbs-inner-container">
+        <div id="thumbnail-container" class="previewPanel">
+          <div id="mat-wrapper">
+            <div id="mat-scroller" class="iscroll-scroller">
+              <ul id="thumbnail-list" class="thumbnail-list list-unstyled">
+                <li
+                  ng-repeat="thumb in onlineMaterialViewCtrl.thumbs"
+                  id="slide-{{$index}}"
+                  class="text-center"
+                  ng-class="{'active': $index == onlineMaterialViewCtrl.activeSlide}"
+                >
+                  <div ng-click="onlineMaterialViewCtrl.gotoSlide($index)">
+                    <img ng-src="{{thumb}}" />
+                    <span data-id="slide-no" class="text-center"
+                      >{{$index + 1}}</span
+                    >
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="info-area" class="info-bar">
+        <span
+          data-id="rp-prev-slide"
+          ng-class="{ 'disabled' : (onlineMaterialViewCtrl.activeSlide == 0) }"
+          ng-click="onlineMaterialViewCtrl.prevSlide()"
+        >
+          <i class="dc-icon dc-arrow-left"></i>
+        </span>
+        <span
+          data-id="rp-next-slide"
+          ng-class="{ 'disabled' : (onlineMaterialViewCtrl.activeSlide == onlineMaterialViewCtrl.slides.length-1) }"
+          ng-click="onlineMaterialViewCtrl.nextSlide()"
+        >
+          <i class="dc-icon dc-right-arrow"></i>
+        </span>
+      </div>
+    </div>
+
+    <div class="whiteboard-container">
+      <div class="" id="viewport">
+        <div
+          id="content-area"
+          class="content-area hd_ppt"
+          style="display: block;"
+        ></div>
+      </div>
+    </div>
+
+    <div class="notes-panel">
+      <div class="notesControls animated">
+        <h5 data-id="rp-notes-title">NOTES</h5>
+        <div class="font-buttons">
+          <span
+            data-id="rp-font-decrease"
+            ng-click="onlineMaterialViewCtrl.adjustFont($event,'decrease')"
+            ng-class="{'active' : onlineMaterialViewCtrl.notesFontSize === 'decrease'}"
+            class="dc-font-decrease"
+          ></span>
+          <span
+            data-id="rp-font-default"
+            ng-click="onlineMaterialViewCtrl.adjustFont($event,'default')"
+            ng-class="{'active' : (onlineMaterialViewCtrl.notesFontSize != 'decrease' && onlineMaterialViewCtrl.notesFontSize != 'increase' ) }"
+            class="dc-font-default"
+          ></span>
+          <span
+            data-id="rp-font-increase"
+            ng-click="onlineMaterialViewCtrl.adjustFont($event,'increase')"
+            ng-class="{'active' : onlineMaterialViewCtrl.notesFontSize === 'increase'}"
+            class="dc-font-increase"
+          ></span>
+        </div>
+      </div>
+      <div id="notesPanel" class="animated">
+        <div data-id="rp-notes" class="notes">
+          <div
+            id="wrapperNotes"
+            ng-iscroll="wrapperNotes"
+            ng-iscroll-delay="1000"
+            style="overflow: hidden;"
+            ng-iscroll-form="true"
+            class="iscroll-wrapper"
+            ng-class="onlineMaterialViewCtrl.notesFontSize"
+          >
+            <p
+              ng-bind-html="onlineMaterialViewCtrl.slides[onlineMaterialViewCtrl.activeSlide].notes | to_trusted"
+              class="iscroll-scroller"
+            ></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

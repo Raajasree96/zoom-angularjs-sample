@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<head>
+    <style>
+            html,body {
+                width:100%;
+                height : 100%;
+            }
+
+            .hd_ppt{
+                width:100%;
+                height: 100%;
+            }
+
+            .hd_ppt iframe {
+                width:100%;
+                height:100%;
+                top:0;
+                left:0
+            }
+
+
+    </style>
+    <script type="text/javascript">
+
+        var initScaling = function initScaling() {
+
+                var frame = document.getElementById('frame');
+
+                var iframeDoc = frame.contentDocument? frame.contentDocument : frame.contentWindow.document;
+
+                if(iframeDoc.getElementsByClassName('content_area')[0].offsetWidth) {
+
+                    var scaleFactor = (iframeDoc.querySelector("body").offsetWidth / iframeDoc.getElementsByClassName('content_area')[0].offsetWidth).toFixed(3);
+     
+                    if(iframeDoc.querySelector("body").offsetWidth < 850){
+                        scaleFactor = parseFloat(scaleFactor) + parseFloat('0.028');
+                    } 
+                    else {
+                        scaleFactor = parseFloat(scaleFactor) + parseFloat('0.012');
+                    }
+
+                    iframeDoc.getElementsByClassName('content_area')[0].style.transform = 'scale(' + scaleFactor + ',' + scaleFactor + ')';
+                }
+                else {
+                    loadIFrameElement();
+                }
+
+        };
+
+        var loadIFrameElement = function loadIFrameElement() {
+            setTimeout(initScaling, 5000);
+        };
+
+    </script>
+</head>
+<body style="margin:0px;">
+<div id="content-area" class="content-area hd_ppt" style="display: block;">
+    <iframe id="frame" width="100%" height="100%" align="center" onload="loadIFrameElement()"
+            style="border:none;margin-top:0px;"></iframe>
+</div>
+<script>
+			var domain = window.document.domain;
+
+            if(domain.indexOf("wallstreetenglish.com.cn") >= 0){
+                window.document.domain = "wallstreetenglish.com.cn";
+            }
+            else if(domain.indexOf("wallstreetenglish.com") >= 0){
+                window.document.domain = "wallstreetenglish.com";
+            }
+
+            function setupWebViewJavascriptBridge(callback) {
+                if (window.WebViewJavascriptBridge) { return callback(WebViewJavascriptBridge); }
+                if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
+                window.WVJBCallbacks = [callback];
+                var WVJBIframe = document.createElement('iframe');
+                WVJBIframe.style.display = 'none';
+                WVJBIframe.src = 'wvjbscheme://__BRIDGE_LOADED__';
+                document.documentElement.appendChild(WVJBIframe);
+                setTimeout(function() { document.documentElement.removeChild(WVJBIframe) }, 0)
+            }
+
+            setupWebViewJavascriptBridge(function(bridge) {
+
+                bridge.registerHandler('loadPPT',function(data,responseCallback) {
+                    var obj = JSON.parse(data);
+                    presentationUrl = obj.url;
+                    index = obj.index;
+                    currentStepIndex = obj.currentStepIndex;
+console.log(data);
+                    loadPPT();
+                });
+
+
+                bridge.registerHandler('orientationChange',function(data,responseCallback) {
+
+                    var frame = document.getElementById('frame');
+                    var iframeDoc = frame.contentDocument? frame.contentDocument : frame.contentWindow.document;
+                    
+                    var scaleFactor = (iframeDoc.querySelector("body").offsetWidth / iframeDoc.getElementsByClassName('content_area')[0].offsetWidth).toFixed(3);
+                    
+                    if(iframeDoc.querySelector("body").offsetWidth >= 850){
+                        scaleFactor = parseFloat(scaleFactor) + parseFloat('0.040');
+                    }
+                    iframeDoc.getElementsByClassName('content_area')[0].style.transform = 'scale(' + scaleFactor + ',' + scaleFactor + ')';
+                });
+
+                bridge.registerHandler('goToSlide',function(data,responseCallback) {
+                    var obj = JSON.parse(data);
+                    var slide = obj.index;
+                    var stepIndex = obj.stepIndex;
+
+console.log(data);
+                    if (stepIndex == 0) {
+                        gotoSlide(slide);
+                    } else {
+                        nextAnim(slide,stepIndex);
+                    }
+                });
+            });
+
+            var presentationUrl;
+            var presentationFrame = document.getElementById("frame");
+            var ispringPresentationConnector = {};
+            var playbackController;
+            var index = 0;
+            var currentStepIndex = 0;
+            var slidesCount;
+            var isPlayedPresentation;
+            var isPPTLoaded = false;
+
+            ispringPresentationConnector.register = function(player)
+            {
+                var presentation = player.presentation();
+                slidesCount = presentation.slides().count();
+                playbackController = player.view().playbackController();
+
+                playbackController.slideChangeEvent().addHandler(function (slideIndex) {
+                        if (isPPTLoaded) {
+                            index = slideIndex;
+                            setupWebViewJavascriptBridge(function(bridge){
+                                bridge.callHandler('slideIndex',slideIndex);
+                            });
+                        }
+                });
+
+                playbackController.stepChangeEvent().addHandler(function(stepIndex){
+                    if (!isPPTLoaded) {
+                        isPPTLoaded = true;
+                        setTimeout(reposition, 10);
+                        setupWebViewJavascriptBridge(function(bridge){
+                            bridge.callHandler('pptLoaded',"");
+                        });
+                    } else {
+                        currentStepIndex = stepIndex;
+                        setupWebViewJavascriptBridge(function(bridge){
+                            bridge.callHandler('stepIndex',currentStepIndex);
+                        });
+                    }
+                });
+            };
+
+            function initializePPT() {
+                if (currentStepIndex == 0) {
+                    gotoSlide(index);
+                } else {
+                   nextAnim(index,currentStepIndex);
+                }
+            }
+
+            function loadPPT() {
+                isPPTLoaded = false;
+                if(presentationUrl) {
+                    presentationFrame.src = presentationUrl;
+                    setTimeout(reposition, 1000);
+                }
+            }
+
+            function reposition() {
+                    presentationFrame.style.marginTop = "-2000px";
+                    presentationFrame.style.marginTop = "0px";
+            }
+
+            function gotoSlide(slide) {
+                index = slide;
+                if(playbackController) {
+                    playbackController.gotoSlide(index);
+                }
+            }
+
+            function nextAnim(slide,stepIndex) {
+                index = slide;
+                currentStepIndex=stepIndex;
+                if(playbackController) {
+                    playbackController.gotoTimestamp(slide, stepIndex, 0, true);
+                }
+            }
+
+
+
+</script>
+</body>
+</html>

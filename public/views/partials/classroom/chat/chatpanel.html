@@ -1,0 +1,116 @@
+
+<div id="chaticon" tabindex="-1" for="chat-menu" ng-init="chat.historyView=false;" ng-class="chat.className" ng-animate=" 'animate' " class="chat-wraper">
+  <div ng-class="{'chatter-box' : !chat.userList}" class="chat-container">
+    <div ng-class="{minimized: !chat.icon}" class="chat-cont">
+      <div class="chat-bar">
+        <!-- This div will show the details of the specific user in the chat list.-->
+        <div ng-show="!chat.userList">
+          <div data-id="rp-chatter-box" class="chatter-box-title">
+            <div data-id="rp-back-button" data-ng-click="chat.showUserList(chat.action.target);" style="cursor:pointer" class="back-icon"><span class="dc-icon dc-left_arrow"></span></div>
+            <div class="user-details"><span data-id="rp-back-button" ng-show="chat.action.target.id == 'EVERYONE'" class="dc-icon user-avatar"><span data-id="rp-chatter-box-icon" class="dc-icon dc-user-group"></span></span><span ng-show="chat.action.target.id != 'EVERYONE'" class="user-avatar">
+                <!--span.dc-user-avatar(data-id="rp-private-icon")--><img ng-show="chat.action.target.online &amp;&amp; chat.action.target.photoUri != null" ng-src="{{chat.action.target.photoUri}}" data-id="rp-group-user"/><span ng-show="chat.action.target.photoUri == null &amp;&amp; chat.action.target.online" class="username-substring">{{(chat.action.target.firstName | firstletter ) + (chat.action.target.lastName | firstletter)}}</span><i ng-show="!chat.action.target.online" class="dc-icon dc-user-avatar"></i></span><span data-ng-bind="chat.action.target.userName | lowercase" data-id="rp-chat-name" class="chat-name"> </span></div>
+            <div class="message-count">
+              <!--span.count 2-->
+            </div>
+          </div>
+        </div>
+        <!-- This div will show the name of the current user (myself) in the header part.  -->
+        <div ng-show="chat.userList">
+          <div class="user-dtls">
+            <div class="pull-left">
+              <h3 data-id="rp-chat-title" class="chat-title">Chat</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- This div will show the list of users joined in the class in chat panel.-->
+      <div ng-show="chat.userList" class="chat-sidepanel animated">
+        <div class="chat-separator">
+          <div class="chat-individuals-cont">
+            <div ng-if="!chat.hasUserJoined" ng-class=" {'noticon' : chat.userEmptyAlert , 'icon': !chat.userEmptyAlert } " class="alert-msg"><span data-id="rp-chat-avatar" class="chat-avatar dc-icon dc-user-avatar"></span><span data-id="rp-yet-to-join">Participants yet to join.</span></div>
+            <ul>
+              <li data-ng-click="chat.switchChatWindow(chat.objEveryone)" data-id="rp-public-chat" class="chat-list-item">
+                <div>
+                  <div class="device-notifications">
+                    <!--span.dc-icon.dc-phone-->
+                  </div>
+                  <div class="user-details"><span class="dc-icon user-avatar"><span data-id="rp-group-user" class="dc-icon dc-user-group"></span></span><span data-id="rp-chat-name" class="chat-name">Everyone</span></div>
+                  <div data-id="rp-public-msg-count" class="message-count"><span data-ng-class="{'more-than-99': chat.chatNotifications['EVERYONE'] > 99}" data-ng-bind="chat.chatNotifications['EVERYONE'] > 99 ? '99+' : chat.chatNotifications['EVERYONE']" ng-if="(chat.chatNotifications['EVERYONE']) > 0" class="count"></span>
+                    <!--span.unread-count(ng-if='chat.unreadMessages["everyone"] && -->
+                    <!--chat.unreadMessages["everyone"]!==0 && chat.isOpened')-->
+                    <!--	em{{chat.unreadMessages["everyone"] | twodigit}}-->
+                  </div>
+                </div>
+              </li>
+              <li data-id="rp-private-chat" data-ng-repeat="user in chat.users | sortObjectBy" data-ng-if="user.id !== chat.currentUser.id &amp;&amp; user.joined" data-ng-click="chat.switchChatWindow(user)" class="chat-list-item">
+                <div data-ng-class="{offline: !user.online }">
+                  <div class="device-notifications"><span ng-show="user.deviceType == 'mobile'" class="dc-icon dc-phone"></span></div>
+                  <div class="user-details"><span class="user-avatar">
+                      <!--span.dc-user-avatar(data-id="rp-private-icon")--><img ng-show="user.online &amp;&amp; user.photoUri != null" ng-src="{{user.photoUri}}" data-id="rp-group-user"/><span ng-show="user.photoUri == null &amp;&amp; user.online" class="username-substring">{{(user.firstName | firstletter) + (user.lastName | firstletter)}}</span><i ng-show="!user.online" class="dc-icon dc-user-avatar"></i></span>
+                    <div data-ng-class="{'teacher-block':user.role == 'teacher'}"><span data-ng-bind="user.userName | sentence | lowercase" data-id="rp-student-name" class="chat-name"></span><span ng-if="user.role =='teacher'" data-id="rp-teacher-name" class="teacher">teacher</span></div>
+                  </div>
+                  <div data-id="rp-private-msg-count" class="message-count"><span data-ng-class="{'more-than-99': chat.chatNotifications[user.id] > 99}" data-ng-bind="(chat.chatNotifications[user.id] > 99) ? '99+' : chat.chatNotifications[user.id]" ng-if="(chat.chatNotifications[user.id]) > 0" class="count"></span></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div id="chat-view" ng-show="!chat.userList" exec-on-scroll-to-bottom="exec-on-scroll-to-bottom" callback-fn="updateChatNotification()" ng-class="{'public-chat': chat.action.target.id == 'EVERYONE', 'private-chat': chat.action.target.id != 'EVERYONE'}" class="chat-view">
+        <!--Bubble display of chat messages-->
+        <div scroll-bottom="chat.chatAllUsers[chat.action.target.id]" is-userlist-opened="chat.userList" class="chat-bubble">
+          <div data-id="{'rp-bubble-me':chatMsg.fromUserId == chat.currentUser.id, 'rp-bubble-other':chatMsg.fromUserId != chat.currentUser.id}" ng-class="{'talk-bubble bubbleanimate bounceInLeft':chatMsg.fromUserId != chat.currentUser.id, 'talk-bubble-me bubbleanimate bounceInRight ':chatMsg.fromUserId == chat.currentUser.id, 'emoji-without-text': chatMsg.onlyEmoji == true,'emoji-with-text': chatMsg.onlyEmoji == false}" ng-repeat="chatMsg in chat.chatAllUsers[chat.action.target.id]">
+            <h5 ng-if="chat.action.target.id == 'EVERYONE' &amp;&amp; chatMsg.fromUserId != chat.currentUser.id" ng-bind="chatMsg.senderRole == 'teacher'?'Teacher':chatMsg.fromUser"></h5>
+            <p ng-bind-html="chatMsg.chatHeader | to_trusted">	</p>
+          </div>
+        </div>
+        <!--div.scroll-bottom(ng-show="unreadMsg" ng-click="scrollToUnreadMsg();")
+        //span Unread Messages
+        //span.dc-icon.dc-dc-arrow-down
+
+
+
+        -->
+      </div>
+      <div ng-if="!chat.userList" class="text-area">
+        <div ng-disabled="chat.action.target.online == false" class="emoticons">
+          <div ng-class="{'slideInUp':showEmojis == true, 'slideOutDown':showEmojis == false}" ng-hide="showEmojis == null || chat.action.target.online == false" class="emoji-collection dcanimated">
+            <ul>
+              <li ng-repeat="emoticon in chat.emoticons" ng-attr-title="{{emoticon.title}}" ng-click="chat.insertEmoji(emoticon)" data-id="rp-emojiset">
+                <p ng-bind-html="emoticon.html | to_trusted"> </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div ng-if="showTagging == true &amp;&amp; chat.action.target.id == 'EVERYONE'" class="tagging-wrapper">
+          <ul>
+            <li ng-repeat="tagUser in chatUsers | filter:{firstName : tagValue} | limitTo:8 | sortObjectBy" ng-class="{'tag-online-user':tagUser.online == true, 'tag-offline-user': tagUser.online == false}" ng-click="chat.tagChatUser(tagUser);">
+              <!--span.dc-icon.user-avatar//span.dc-icon.dc-user-avatar
+              --><span class="user-avatar">
+                <!--span.dc-user-avatar(data-id="rp-private-icon")--><img ng-show="tagUser.online &amp;&amp; tagUser.photoUri != null" ng-src="{{tagUser.photoUri}}"/><span ng-show="tagUser.photoUri == null &amp;&amp; tagUser.online" class="username-substring">{{ (tagUser.firstName | firstletter) + (tagUser.lastName | firstletter )}}</span><i ng-show="!tagUser.online" class="dc-icon dc-user-avatar"></i></span>
+              <div ng-cloak="ng-cloak" class="userName">{{ ((user.role == 'student' && tagUser.role != 'teacher') ? tagUser.userName  : (user.role == 'teacher' ) ? tagUser.userName : 'Teacher' ) | characters: 15 }}</div>
+            </li>
+          </ul>
+        </div>
+        <div ng-class="{'textarea-active':chat.action.input!= '','textarea-inactive':chat.action.input == '','userOffline' : !chat.action.target.online &amp;&amp; chat.action.target.id != 'EVERYONE'}">
+          <div data-id="rp-emoji-activate" class="emoji-activate"><span data-ng-click="toggleEmojis(showEmojis);" ng-class="{'active-emoji':showEmojis == true &amp;&amp; (chat.action.target.online != false || chat.action.target.id == 'EVERYONE')}" class="dc-icon dc-smile"></span></div>
+          <textarea id="chat-message"
+                    data-id="rp-text-area"
+                    tabindex="-1"
+                    rows="1"
+                    cols="18"
+                    maxlength="500"
+                    placeholder="{{(chat.action.target.online || chat.action.target.id == 'EVERYONE')?'Write a message': chat.action.target.firstName + ' is offline. You cannot message right now'}}"
+                    ng-blur="chat.tagReset()"
+                    data-ng-model="chat.action.input"
+                    ng-click="chat.setCaretPosition()"
+                    ng-change="chat.onChatValueChange(chat.action.input);"
+                    enter-submit="chat.sendMessage(chat.action.input);"
+                    ng-disabled="chat.action.target.online == false">
+          </textarea>
+          <button data-id="rp-send-button" disable-right-click="disable-right-click" tabindex="-1" data-ng-click="chat.sendMessage(chat.action.input);" ng-disabled="chat.action.target.online == false" class="btn dc-icon dc-chat-send">			 </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

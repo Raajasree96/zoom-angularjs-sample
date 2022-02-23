@@ -1,0 +1,72 @@
+
+<!--div.toolbar#toolbar(tabIndex="-1", ng-blur="closeToolset()",ng-class="{'animated fadeInLeft' : animatedPrivilege , 'animated fadeOutLeft' : !animatedPrivilege }",ng-if="privilege.enabled")-->
+<div id="toolbar" tabIndex="-1" ng-blur="closeToolset()" ng-style="(hasPrivilege &amp;&amp; user.role == 'student') ? {'top': '40px','padding-top':annotationPostion,'z-index':'1','padding-left':'0px','left':'20px','background-color':'transparent','border-right':'0'} : {top: '40px'}" ng-show="user.role == 'teacher' || hasPrivilege" data-id="rp-toolbar" class="toolbar col-sm-1">
+  <ul>
+    <!-- File Import-->
+    <!--li#file-upload(ng-class="{ 'control-disabled' : disableControls }", ng-attr-title="{{ (disableControls == false) ? 'Import File' : '' }}", ng-if="user.role == 'teacher'")
+    a.icon-wrapper(href='#', data-toggle='modal', ng-click="toggleExplorer(); closeToolset()")
+    	i.dc-icon.dc-upload
+    
+    -->
+    <!-- Privilege-->
+    <!--li#privilege(ng-class="{active : activeToolset == 'default'}", title="Privilege", ng-if="user.role == 'teacher'", ng-disabled="disableControls")
+    a.icon-wrapper(href="#", ng-click="showPrivileges()", title="Privilege")
+    	i.dc-icon.dc-previlege
+    
+    -->
+    <!-- Default Tool-->
+    <li data-id="rp-default-tool" ng-class="{active : activeToolset == 'default', 'control-disabled' : disableControls }" ng-if="user.role == 'teacher'"><a href="#" ng-click="changeTool('default', 'default')" ng-attr-title="{{ (disableControls == false) ? 'Default' : '' }}" class="icon-wrapper"><i class="dc-icon dc-pointer"></i></a></li>
+    <!-- Pointer Tool-->
+    <li data-id="rp-pointer-tool" ng-class="{active : activeToolset == 'pointer', 'control-disabled' : disableControls }"><a href="#" ng-click="changeTool('pointer', 'pointer')" ng-attr-title="{{ (disableControls == false) ? 'Pointer' : '' }}" class="icon-wrapper"><i class="dc-icon dc-whiteboard-pointer"></i></a></li>
+    <!-- Pencil-->
+    <li id="freeHand" ng-class="{active : activeToolset == 'pencil', 'control-disabled' : disableControls }" ng-attr-title="{{ (disableControls == false) ? 'Free hand draw' : '' }}"><a data-id="rp-freeHand" href="#" ng-click="changeTool(toolsets['pencil'].active, 'pencil')" class="icon-wrapper"><i ng-class="toolsets['pencil'].icon" class="dc-icon"></i></a><span ng-mouseover="toggleToolset('pencil')" class="tool-toggle"><i data-id="rp-freeHand-dropdown" class="dc-icon dc-dc-menu-arrow-down"></i></span>
+      <ul ng-class="{fadeIn : toolsets['pencil'].toggled == true, fadeOut : toolsets['pencil'].toggled == false, toolbarEventsEnable : toolsets['pencil'].toolbarEvents , toolbarEventsDisable : !toolsets['pencil'].toolbarEvents }" ng-if="toolsets['pencil'].toggledFlag" class="pencil dcanimated">
+        <!-- Pencil-->
+        <li ng-hide="toolsets['pencil'].active == 'pencil'" title="Pencil" data-id="rp-pencil"><a href="#" ng-click="changeTool('pencil', 'pencil'); bindToolset('pencil', 'pencil', 'dc-icon dc-pencil')" title="Pencil" class="icon-wrapper"><i class="dc-icon dc-pencil"></i></a></li>
+        <!-- Marker-->
+        <li ng-hide="toolsets['pencil'].active == 'marker'" title="Marker" data-id="rp-marker"><a href="#" ng-click="changeTool('marker', 'pencil'); bindToolset('pencil', 'marker', 'dc-icon dc-marker')" title="Marker" class="icon-wrapper"><i class="dc-icon dc-marker"></i></a></li>
+      </ul>
+    </li>
+    <!-- Shapes-->
+    <li id="shapes" ng-class="{active : activeToolset == 'shape',  'control-disabled' : disableControls }" ng-attr-title="{{ (disableControls == false) ? 'Shape' : '' }}"><a href="#" ng-click="changeTool(toolsets['shape'].active, 'shape')" class="icon-wrapper"><i ng-class="toolsets['shape'].icon" class="dc-icon"></i></a><span ng-mouseover="toggleToolset('shape')" class="tool-toggle"><i data-id="rp-shapes-dropdown" class="dc-icon dc-dc-menu-arrow-down"></i></span>
+      <ul ng-class="{fadeIn : toolsets['shape'].toggled == true, fadeOut : toolsets['shape'].toggled == false, toolbarEventsEnable : toolsets['shape'].toolbarEvents , toolbarEventsDisable : !toolsets['shape'].toolbarEvents }" ng-if="toolsets['shape'].toggledFlag" class="shape dcanimated">
+        <!-- Circle-->
+        <li data-id="rp-circle" ng-hide="toolsets['shape'].active == 'circle'" title="Circle"><a href="#" ng-click="changeTool('circle', 'shape'); bindToolset('shape', 'circle', 'dc-icon dc-circle')" title="Circle" class="icon-wrapper"><i class="dc-icon dc-circle"></i></a></li>
+        <!-- Rectangle-->
+        <li data-id="rp-rectangle" ng-hide="toolsets['shape'].active == 'rectangle'" title="Rectangle"><a href="#" ng-click="changeTool('rectangle', 'shape'); bindToolset('shape', 'rectangle', 'dc-icon dc-rectangle')" title="Rectangle" class="icon-wrapper"><i class="dc-icon dc-rectangle"></i></a></li>
+        <!-- Line-->
+        <li data-id="rp-line" ng-hide="toolsets['shape'].active == 'line'" title="Line"><a href="#" ng-click="changeTool('line', 'shape'); bindToolset('shape', 'line', 'dc-icon dc-line')" title="Line" class="icon-wrapper"><i class="dc-icon dc-line"></i></a></li>
+      </ul>
+    </li>
+    <!-- Text Box-->
+    <li ng-class="{active : activeToolset == 'textbox', 'control-disabled' : disableControls }" ng-attr-title="{{ (disableControls == false) ? 'Insert Text' : '' }}"><a href="#" ng-click="changeTool('textbox', 'textbox')" title="Text" class="icon-wrapper"><i data-id="rp-text-editor" class="dc-icon dc-text-edit"></i></a></li>
+    <!-- Erasers-->
+    <li id="erasers" ng-class="{active : activeToolset == 'eraser', 'control-disabled' : disableControls }" ng-attr-title="{{ (disableControls == false) ? 'Eraser' : '' }}"><a href="#" ng-click="changeTool(toolsets['eraser'].active, 'eraser')" class="icon-wrapper"><i ng-class="toolsets['eraser'].icon" class="dc-icon"></i></a><span ng-mouseover="toggleToolset('eraser')" class="tool-toggle"><i data-id="rp-erasers" class="dc-icon dc-dc-menu-arrow-down"></i></span>
+      <ul ng-class="{fadeIn : toolsets['eraser'].toggled == true, fadeOut : toolsets['eraser'].toggled == false, toolbarEventsEnable : toolsets['eraser'].toolbarEvents , toolbarEventsDisable : !toolsets['eraser'].toolbarEvents }" ng-if="toolsets['eraser'].toggledFlag" class="eraser dcanimated">
+        <!-- Free Eraser-->
+        <li ng-hide="toolsets['eraser'].active == 'eraser-free'" title="Free Eraser" data-id="rp-free-eraser"><a href="#" ng-click="changeTool('eraser-free', 'eraser'); bindToolset('eraser', 'eraser-free', 'dc-icon dc-eraser')" title="Free Eraser" class="icon-wrapper"><i class="dc-icon dc-eraser"></i></a></li>
+        <!-- Path Eraser-->
+        <li ng-hide="toolsets['eraser'].active == 'eraser-path'" title="Shape Eraser" data-id="rp-shape-eraser"><a href="#" ng-click="changeTool('eraser-path', 'eraser'); bindToolset('eraser', 'eraser-path', 'dc-icon dc-eraser-path')" title="Shape Eraser" class="icon-wrapper"><i class="dc-icon dc-eraser-path"></i></a></li>
+      </ul>
+    </li>
+    <!-- Color-->
+    <li id="colors" ng-attr-title="{{ (disableControls == false) ? 'Color' : '' }}" ng-class="{ 'control-disabled' : disableControls }"><a href="#" ng-click="closeToolset()" class="icon-wrapper"><i ng-class="toolsets['color'].icon" class="dc-icon"></i></a><span ng-mouseover="toggleToolset('color')" class="tool-toggle"><i data-id="rp-colors-dropdown" class="dc-icon dc-dc-menu-arrow-down"></i></span>
+      <ul ng-class="{fadeIn : toolsets['color'].toggled == true, fadeOut : toolsets['color'].toggled == false,  toolbarEventsEnable : toolsets['color'].toolbarEvents , toolbarEventsDisable : !toolsets['color'].toolbarEvents }" ng-if="toolsets['color'].toggledFlag" class="color dcanimated">
+        <li ng-hide="toolsets['color'].active == 'black'" title="Black" data-id="rp-black-color"><a href="#" ng-click="changeColor('black'); bindToolset('color', 'black', 'dc-icon dc-color color-black')" title="Black" class="icon-wrapper"><i class="dc-icon dc-color color-black"></i></a></li>
+        <li ng-hide="toolsets['color'].active == 'red'" title="Red" data-id="rp-red-color"><a href="#" ng-click="changeColor('red'); bindToolset('color', 'red', 'dc-icon dc-color color-red')" title="Red" class="icon-wrapper"><i class="dc-icon dc-color color-red"></i></a></li>
+        <li ng-hide="toolsets['color'].active == 'green'" title="Green" data-id="rp-green-color"><a href="#" ng-click="changeColor('green'); bindToolset('color', 'green', 'dc-icon dc-color color-green')" title="Green" class="icon-wrapper"><i class="dc-icon dc-color color-green"></i></a></li>
+        <li ng-hide="toolsets['color'].active == 'blue'" title="Blue" data-id="rp-blue-color"><a href="#" ng-click="changeColor('blue'); bindToolset('color', 'blue', 'dc-icon dc-color color-blue')" title="Blue" class="icon-wrapper"><i class="dc-icon dc-color color-blue"></i></a></li>
+      </ul>
+    </li>
+    <!-- Size-->
+    <li id="size" ng-attr-title="{{ (disableControls == false) ? 'Size' : '' }}" ng-class="{ 'control-disabled' : disableControls }"><a href="#" ng-click="closeToolset()" class="icon-wrapper"><i class="dc-icon {{'dc-size-' + toolsets['size'].active}}"></i></a><span ng-mouseover="toggleToolset('size')" class="tool-toggle"><i data-id="rp-size" class="dc-icon dc-dc-menu-arrow-down"></i></span>
+      <ul ng-class="{fadeIn : toolsets['size'].toggled == true, fadeOut : toolsets['size'].toggled == false,  toolbarEventsEnable : toolsets['size'].toolbarEvents , toolbarEventsDisable : !toolsets['size'].toolbarEvents }" ng-if="toolsets['size'].toggledFlag" class="size dcanimated">
+        <li ng-hide="toolsets['size'].active == 's'" title="Small" data-id="rp-size-small"><a href="#" ng-click="changeSize('s'); bindToolset('size', 's', 'dc-icon dc-size-s')" title="Small" class="icon-wrapper"><i class="dc-icon dc-size-s"></i></a></li>
+        <li ng-hide="toolsets['size'].active == 'm'" title="Medium" data-id="rp-size-medium"><a href="#" ng-click="changeSize('m'); bindToolset('size', 'm', 'dc-icon dc-size-m')" title="Medium" class="icon-wrapper"><i class="dc-icon dc-size-m"></i></a></li>
+        <li ng-hide="toolsets['size'].active == 'l'" title="Large" data-id="rp-size-large"><a href="#" ng-click="changeSize('l'); bindToolset( 'size', 'l','dc-icon dc-size-l')" title="Large" class="icon-wrapper"><i class="dc-icon dc-size-l"></i></a></li>
+      </ul>
+    </li>
+    <!-- Clear All-->
+    <li data-id="rp-clear-all" ng-attr-title="{{ (disableControls == false) ? 'Clear All' : '' }}" ng-if="user.role == 'teacher'" ng-class="{  'control-disabled' : disableControls }"><a href="#" ng-click="clearAll(); closeToolset()" class="icon-wrapper"><i class="dc-icon dc-clear-all"></i></a></li>
+  </ul>
+</div>

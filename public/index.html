@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html ng-app="digitalclassroom">
+  <head>
+    <link rel="short icon" href="images/favicons/favicon.ico" />
+    <title>Digital Classroom</title><meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- For dev -->
+    <meta http-equiv="origin-trial" content="AtfBCqlMBHkL6lOMHj7aDIu8JYEq8LgX7sjU5hb0MJFlkSj6+cE2WRjUhiNuZcY3zKXRqsAQxm4fAKUUtmSHIgwAAACUeyJvcmlnaW4iOiJodHRwczovL2RpZ2l0YWxjbGFzc3Jvb20tZGV2LndhbGxzdHJlZXRlbmdsaXNoLmNvbTo0NDMiLCJmZWF0dXJlIjoiVW5yZXN0cmljdGVkU2hhcmVkQXJyYXlCdWZmZXIiLCJleHBpcnkiOjE2NTg4Nzk5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==" />
+    <!-- For QUal -->
+    <meta http-equiv="origin-trial" content="Ave/ovX+xJVXlp68QQV1R1+qm1CenTaOSGA76Stw4TRk2tPfnBYej8fO8U+iwHa4wkHzFJzd8K9VdUdKdts9lgIAAACVeyJvcmlnaW4iOiJodHRwczovL2RpZ2l0YWxjbGFzc3Jvb20tcXVhbC53YWxsc3RyZWV0ZW5nbGlzaC5jb206NDQzIiwiZmVhdHVyZSI6IlVucmVzdHJpY3RlZFNoYXJlZEFycmF5QnVmZmVyIiwiZXhwaXJ5IjoxNjU4ODc5OTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=" />
+    <!-- For stage -->
+    <meta http-equiv="origin-trial" content="Av8nVNCblPAn3APi3Yadi7gCmpm/eMYJY5ng+oNzXpOPjTKtnoPROtHrQMi8q4lxcp3EHorOUXrBxOIwVy931gQAAACUeyJvcmlnaW4iOiJodHRwczovL2RpZ2l0YWxjbGFzc3Jvb20tc3RnLndhbGxzdHJlZXRlbmdsaXNoLmNvbTo0NDMiLCJmZWF0dXJlIjoiVW5yZXN0cmljdGVkU2hhcmVkQXJyYXlCdWZmZXIiLCJleHBpcnkiOjE2NTg4Nzk5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==" />
+    <!-- For prod -->
+    <meta http-equiv="origin-trial" content="Art3QyhhO2hLMOrLh5TmzJuTd9Q+lUHtmfkLqPjFG+r/Hvm2ICqRlY2wWEychxqjJcoZWTqEVd9WDyD0krv0ggcAAACQeyJvcmlnaW4iOiJodHRwczovL2RpZ2l0YWxjbGFzc3Jvb20ud2FsbHN0cmVldGVuZ2xpc2guY29tOjQ0MyIsImZlYXR1cmUiOiJVbnJlc3RyaWN0ZWRTaGFyZWRBcnJheUJ1ZmZlciIsImV4cGlyeSI6MTY1ODg3OTk5OSwiaXNTdWJkb21haW4iOnRydWV9" /> 
+    <link href="/styles/introjs.min.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/bootstrap.min.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/angular-csp.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/app.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/layout.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/animate.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/style.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/reports.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/reportIssue.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/quickslot.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/diagnostics.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/classroom.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/screenshare.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/opentok/stream.css?v=1645593062672" rel="stylesheet"/>
+    <link href="/styles/material-preview.css?v=1645593062672" rel="stylesheet"/>
+  </head>
+  <body ng-controller="masterCtrl" unselectable="on" ondragstart="return false;" ng-class="{'mobile': currentView.view == 'mobile'}" class="ng-cloak userSelect">
+    <div class="continue-alert-popup" ng-show="showAlertModal">
+      <div class="md-modal alert-modal">
+        <div class="modal-body">
+          <p>Click OK to continue using Digital Classroom.</p>
+          <button ng-click="continueClass()" class="btn btn-primary">OK</button>
+        </div>
+      </div>
+    </div>
+    <div ui-view id="{{user.role + 'View'}}" style="width: 100%; height: 100%"></div>
+    <script src="/scripts/angular.min.js?v=1645593062672"></script>
+    <script src="/scripts/lodash.min.js?v=1645593062672"></script>
+    <script src="/scripts/angular-ui-router.min.js?v=1645593062672"></script>
+    <script src="/scripts/moment.js?v=1645593062672"></script>
+    <script src="/primus/primus.js?v=1645593062672"></script>
+    <script src="/scripts/chat/emoji.min.js?v=1645593062672"></script>
+    <script src="/scripts/extensions.js?v=1645593062672"></script>
+    <script src="/scripts/opentok.min.js?v=1645593062672"></script>
+    <script src="/scripts/EnxRtc.js?v=1645593062672"></script>
+    <script src="/scripts/network-test.min.js?v=1645593062672"></script>
+    <script src="/scripts/logger.js?v=1645593062672"></script>
+    <script src="/scripts/detect.min.js?v=1645593062672"></script>
+    <script src="/scripts/ng-file-upload.min.js?v=1645593062672"></script>
+    <script src="/scripts/opentok.module.js?v=1645593062672"></script>
+    <!-- <script src="/scripts/newopentok.module.js?v=1645593062672"></script> -->
+    <script src="/scripts/angular-drag-and-drop-lists.min.js?v=1645593062672"></script>
+    <script src="/config/frontend.config.js?v=1645593062672"></script>
+    <script src="/scripts/app.js?v=1645593062672"></script>
+    <script src="/scripts/iscroll.js?v=1645593062672"></script>
+    <script src="/scripts/ng-iscroll.js?v=1645593062672"></script>
+    <script src="/scripts/crosstab.js?v=1645593062672"></script>
+    <script src="/scripts/intro.min.js?v=1645593062672"></script>
+    <script src="/scripts/angular-intro.min.js?v=1645593062672"></script>
+    <script src="/scripts/zoom/index.umd.js?v=1645593062672"></script>
+    <link href="/styles/header.css?v=1645593062672" rel="stylesheet"/>
+    <!-- [if !IE]>--><script>if(/*@cc_on!@*/false){document.documentElement.className+=' ie10';}</script>
+    <!-- [endif]-->
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131193241-3"></script>
+  </body>
+</html>

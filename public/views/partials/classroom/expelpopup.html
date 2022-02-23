@@ -1,0 +1,24 @@
+
+<div ng-show="showExpelPopup" data-ng-switch="expelPopup" ng-class="{'mdshow animated bounceInUp' : showExpelPopup }" class="expel-wrapper cms-wrapper md-modal col-xs-10 col-sm-6 col-sm-offset-3 col-xs-offset-1">
+  <div data-ng-switch-when="confirmation" class="md-content cms expel">
+    <div class="modal-header">
+      <h2 data-id="rp-settings-title" id="myModalLabel" class="modal-title">Expel {{expelUserData.userName}}</h2><span aria-hidden="true" data-id="rp-seetings-close" ng-click="toggleExpelPopup()" class="dc-icon dc-close"></span>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to expel this student?</p>
+      <div class="expelbutton">
+        <button ng-click="toggleExpelPopup()" class="md-close btn btn-default button-2">No</button>
+        <button ng-click="expel.expelUser(expelUserData,'teacher')" class="btn btn-hdr-primary button-2">Yes</button>
+      </div>
+    </div>
+  </div>
+  <div data-ng-switch-when="information" class="md-content cms expel">
+    <div class="modal-header">
+      <h2 data-id="rp-settings-title" id="myModalLabel" class="modal-title">Teacher has expelled you</h2><span aria-hidden="true" data-id="rp-seetings-close" ng-click="toggleExpelPopup()" class="dc-icon dc-close"></span>
+    </div>
+    <div class="modal-body">
+      <p>The teacher has expelled you from the class due to a reason. Please contact your center to rebook your class.</p>
+    </div>
+  </div>
+</div>
+<div ng-click="toggleExpelPopup()" class="md-overlay"></div>

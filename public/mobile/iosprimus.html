@@ -1,0 +1,405 @@
+<!doctype html>
+<html>
+    <head>
+        <!--<script src="https://digitalclassroom-stg.wallstreetenglish.com.cn/primus/primus.js"></script>-->
+        <script src="/primus/primus.js"></script>
+
+
+        <script>
+
+            var url = window.location.protocol + '//' + window.location.host;
+            var primus;
+            var isSubcribed = false;
+            var isJoined = false;
+            var _lastMsgId = 0;
+            var _activityId = "";
+            var _userId = "";
+            var _reconnected = false;
+            var _reconnecting = false;
+            
+            function setupWebViewJavascriptBridge(callback) {
+                if (window.WebViewJavascriptBridge) { return callback(WebViewJavascriptBridge); }
+                if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
+                window.WVJBCallbacks = [callback];
+                var WVJBIframe = document.createElement('iframe');
+                WVJBIframe.style.display = 'none';
+                WVJBIframe.src = 'wvjbscheme://__BRIDGE_LOADED__';
+                document.documentElement.appendChild(WVJBIframe);
+                setTimeout(function() { document.documentElement.removeChild(WVJBIframe) }, 0)
+            }
+        
+        setupWebViewJavascriptBridge(function(bridge) {
+                                     bridge.registerHandler('openSocket', function(data, responseCallback) {
+                                                            _activityId = data.activityId;
+                                                            _userId = data.studentId;
+                                                            open(data.activityId,data.studentId,data.lastMsgId);
+                                                            });
+                                     bridge.registerHandler('joinMe', function(data, responseCallback) {
+                                                            joinMe(data.activityId,data.studentId);
+                                                            });
+                                     bridge.registerHandler('subscribeUser', function(data, responseCallback) {
+                                                            subscribeUser(data.activityId,data.userId,data.lastMsgId)
+                                                            });
+                                     bridge.registerHandler('muteMic', function(data, responseCallback) {
+                                                            muteMic(data.status,data.uid,data.activityId);
+                                                            });
+                                     
+                                     bridge.registerHandler('muteCam', function(data, responseCallback){
+                                                            muteCam(data.status,data.uid,data.activityId);
+                                                            });
+                                     
+                                     bridge.registerHandler('appLogout', function(data, responseCallback){
+                                                            appLogout(data.uid,data.activityId);
+                                                            });
+                                     
+                                     bridge.registerHandler('endPrimus', function(data, responseCallback){
+                                                            endPrimus();
+                                                            });
+                                     bridge.registerHandler('handrise', function(data, responseCallback){
+                                                            handrise(data.status,data.userId,data.activityId)
+                                                            });
+                                     
+                                     });
+                                     
+                                     function open (activityId,userId, lastMsgId) {
+                                         primus = new Primus(url, { strategy: false });
+                                         
+                                         primus.on('open', function () {
+                                                   console.log("Connection open");
+                                                   
+                                                   if (!isJoined) {
+                                                   setupWebViewJavascriptBridge(function(bridge) {
+                                                                                bridge.callHandler('socketConnected' , 'connected');
+                                                                                });
+                                                   isJoined = true;
+                                                   }
+                                                   
+                                                   primus.on("subscribe", function(msg) {
+                                                             
+                                                             });
+                                                   
+                                                   primus.on("user:joined" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('userJoined' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("change-screen" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('changeScreen' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:add-annotation" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('addAnnotation' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:remove-annotation" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('removeAnnotation' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:clear-all" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('clearAll' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:add-board" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('addBoard' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:close-board" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('closeBoard' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:open-board" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('openBoard' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:import-file" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('importPPT' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:ppt-action" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('pptAction' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:update-pointer" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('updatePointer' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("wb:remove-pointer" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('removePointer' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("self:mute-cam" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('muteCam' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("self:mute-mic" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('muteMic' , msg);
+                                                                                          });
+                                                             });
+                                                   primus.on("remote:mute-mic" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('remoteMuteMic' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("remote:mute-all-mic" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('remoteMuteAllMic' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("user:online" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('userOnline' , msg);
+                                                                                          });
+                                                             
+                                                             
+                                                             
+                                                             });
+                                                   primus.on("handrise:update" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('handrise' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("app:logout" , function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('logOut' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on("end-session", function(msg) {
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('endSession' , msg);
+                                                                                          });
+                                                             });
+                                                   
+                                                   
+                                                   
+                                                   primus.on('reconnect', function (msg) {
+                                                             console.log("primus reconnect");
+                                                             _reconnected = false;
+                                                             _reconnecting = false;
+                                                             });
+                                                   
+                                                   primus.on('reconnect scheduled', function (opts) {
+                                                             console.log("primus reconnect scheduled");
+                                                             });
+                                                   
+                                                   primus.on('reconnected', function (opts) {
+                                                             console.log("primus reconnected");
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('primusReconnected' , opts);
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on('reconnect timeout', function (err, opts) {
+                                                             console.log("primus reconnect timeout");
+                                                             });
+                                                   
+                                                   primus.on('reconnect failed', function (err, opts) {
+                                                             console.log("primus reconnect failed");
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('primusReconnectedFailed' , opts);
+                                                                                          });
+                                                             });
+                                                   
+                                                   
+                                                   primus.on('end', function() {
+                                                             console.log("Connection closed");
+                                                             _reconnected = false;
+                                                             _reconnecting = false;
+                                                             isSubcribed = false;
+                                                             
+                                                             setupWebViewJavascriptBridge(function(bridge) {
+                                                                                          bridge.callHandler('primusEnd' , "");
+                                                                                          });
+                                                             });
+                                                   
+                                                   primus.on('error', function error(err) {
+                                                             console.error('Something horrible has happened', err.stack);
+                                                             });
+                                                   
+                                                   
+                                                   primus.on('data', function(msg) {
+                                                             msg = (msg.data && msg.data.length > 1) ? msg.data[1] : msg;
+                                                             
+                                                             if(msg.event) {
+                                                             
+                                                             console.log("[PRIMUS] Published Message recieved :: ", msg);
+                                                             
+                                                             _lastMsgId = msg.id; // Update the last message id
+                                                             }
+                                                             else {
+                                                             console.log("[PRIMUS] Server Message recieved :: ", msg);
+                                                             }
+                                                             
+                                                             });
+                                                   
+                                                   });
+                                     }
+        
+        function subscribeUser(activityId,userId,lastMsgId) {
+            if (!isSubcribed) {
+                isSubcribed = true;
+                _lastMsgId = lastMsgId;
+                var data = {
+                    channel: activityId,
+                    userId: userId,
+                    userRole: "student",
+                    lastMsgId: _lastMsgId,
+                    //browserToken: _config.browserToken
+                };
+                primus.send('subscribe', data);
+                
+                reconnected = true;
+                _reconnecting = false;
+                
+                handriseUpdate(userId,activityId);
+                
+                
+                setupWebViewJavascriptBridge(function(bridge) {
+                                             bridge.callHandler('subscribeUser' , "");
+                                             });
+                                             
+            }
+        }
+        
+        //updating handrise after internet reconnect
+        
+        function handriseUpdate(userId,activityId) {
+            var data = {
+                status: status,
+                userId: userId,
+            };
+            primus.send("handrise:update", {
+                        channel: activityId,
+                        key: "handrise:update",
+                        event: "handrise:update",
+                        data: data,
+                        publish: false
+                        });
+                _lastMsgId++;
+        }
+        
+        function joinMe(activityId,userId) {
+            var data = {
+                channel: activityId,
+                userId: userId,
+            };
+            
+            var joinMeData = {
+                channel: activityId,
+                key: "user:joined",
+                event: "user:joined",
+                data: data,
+                publish: true
+            };
+            
+            primus.send("user:joined", joinMeData);
+            _lastMsgId++;
+        }
+        
+        function muteMic(status,userId,activityId) {
+            var data = {
+                status: status,
+                uid: userId
+            };
+            
+            var muteMicData = {
+                channel: activityId,
+                key: "self:mute-mic",
+                event: "self:mute-mic",
+                data: data,
+                publish: true
+            };
+            
+            primus.send("self:mute-mic", muteMicData);
+            _lastMsgId++;
+        }
+        
+        function muteCam(status,userId,activityId) {
+            var data = {
+                status: status,
+                uid: userId,
+            };
+            
+            var muteCamData = {
+                channel: activityId,
+                key: "self:mute-cam",
+                event: "self:mute-cam",
+                data: data,
+                publish: true
+            };
+            
+            primus.send("self:mute-cam", muteCamData);
+            _lastMsgId++;
+        }
+        function handrise(status,userId,activityId) {
+            var data = {
+                status: status,
+                userId: userId,
+            };
+            primus.send("handrise:update", {
+                        channel: activityId,
+                        key: "handrise:update",
+                        event: "handrise:update",
+                        data: data,
+                        publish: true
+                        });
+                        _lastMsgId++;
+        }
+        
+        function appLogout(userId,activityId) {
+            var data = {
+                channel: activityId,
+                userId: userId
+            };
+            
+            var logoutData = {
+                channel: activityId,
+                key: "app:logout",
+                event: "app:logout",
+                data: data,
+                publish: true
+            };
+            
+            primus.send("app:logout", logoutData);
+            _lastMsgId++;
+        }
+        
+        function endPrimus() {
+
+            primus.end();
+        }
+        
+            </script>
+    </head>
+    <body>
+    </body>
+</html>

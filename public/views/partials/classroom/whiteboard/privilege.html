@@ -1,0 +1,47 @@
+
+<div ng-show="privilege.isVisible" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: block;" class="modal privilege-popup privilege-title">
+  <div role="document" class="modal-dialog animated fadeIn">
+    <div class="modal-content animated fadeInDown">
+      <div class="modal-header">
+        <h4 data-id="rp-ps-title" class="modal-title">Privilege Sharing</h4>
+        <button data-id="rp-ps-close" type="button" data-dismiss="modal" aria-label="Close" ng-click="privilege.togglePopup()" disable-right-click="disable-right-click" class="close"><span aria-hidden="true">×</span></button>
+        <hr/>
+      </div>
+      <div class="modal-body">
+        <div data-id="rp-students-yet-join" ng-show="!privilege.usersAvailable">
+          <p>Students have not joined the session yet</p>
+        </div>
+        <div ng-show="privilege.usersAvailable">
+          <p>Click on a student to share toolbar access</p>
+          <ul class="user-tiles col-sm-12 no-gutter d-flex flex-wrap">
+            <!--ng-click="privilege.current.id == student.id || !student.online || privilege.grant(student.id)"-->
+            <!--li.col-md-3.user-tile(ng-repeat="student in privilege.students | orderBy: 'joinedTime' | limitTo: 8", ng-if="student.joined" ng-click="privilege.current.id == student.id || !student.online) 
+            div
+            	div.turnoff-video-wrapper(ng-class="{'turnoff-bg': student.online == true, 'logoff-bg': student.online == false}")
+            		i.dc-icon.student-avatar-size.dc-user-avatar
+            	div.privilege-icon-wrapper(ng-show="student.id === privilege.current.id")
+            		i.dc-icon.dc-pencil
+            	p.user-name.col-md-12.no-gutter(data-ng-bind="student.firstName"){{ student.firstName | characters:14 : false }}
+            -->
+            <li ng-repeat="student in privilege.students | orderBy: 'joinedTime' | limitTo: 8" ng-click="privilege.selectStudent($index, student)" ng-if="student.joined" ng-class="{'active-privilege': ($index == privilege.selected &amp;&amp; student.online === true), 'enabled-privilege': student.id === privilege.current.id}" ng-disabled="student.id === privilege.current.id" class="user-tile">
+              <div>
+                <div data-id="rp-user-details" ng-class="{'turnoff-bg': student.online == true, 'logoff-bg': student.online == false}" class="turnoff-video-wrapper">
+                  <div class="profile-picture"><img ng-show="student.online &amp;&amp; student.photoUri != null" ng-src="{{student.photoUri}}"/><span ng-show="student.photoUri == null &amp;&amp; student.online" class="username-substring">{{(student.firstName | firstletter) + (student.lastName | firstletter)}}</span><i ng-show="!student.online" class="dc-icon dc-user-avatar"></i>
+                    <!--img(ng-src="{{student.photoUri}}" ng-show="student.photoUri != null")-->
+                  </div>
+                  <!--i(data-id="user-avatar-icon" , ng-show="student.photoUri == null").dc-icon.student-avatar-size.dc-avatar-->
+                  <p data-ng-bind="student.firstName | characters:15 : false" data-id="user-name" class="user-name col-md-12 no-gutter"></p>
+                </div>
+                <div ng-show="($index == privilege.selected || student.id === privilege.current.id) &amp;&amp; (student.online === true)" class="privilege-icon-wrapper"><i class="dc-icon dc-pencil"></i></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div style="text-align: center" class="modal-footer">
+        <button data-id="rp-pr-share" ng-click="privilege.grant(privilege.selectedId)" ng-disabled="!privilege.selectedId" disable-right-click="disable-right-click" class="btn btn-hdr-primary privilege-share">Share</button>
+        <button data-id="rp-pr-return" ng-click="privilege.revoke()" ng-disabled="privilege.current.role === 'teacher'" disable-right-click="disable-right-click" class="btn btn-hdr-primary privilege-return">Return</button>
+      </div>
+    </div>
+  </div>
+</div>

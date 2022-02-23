@@ -1,0 +1,67 @@
+
+<div ng-show="breakout.isVisible" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: block;" class="modal privilege-popup">
+  <div role="document" class="modal-dialog breakout-modal animated fadeIn">
+    <div class="modal-content animated fadeInDown breakoutcontainer">
+      <div class="modal-header d-flex justify-content-between">
+        <h4 data-id="rp-breakout-session" class="modal-title">Breakout Sessions</h4>
+        <button type="button" data-dismiss="modal" aria-label="Close" ng-click="breakout.togglePopup()" disable-right-click="disable-right-click" class="close"><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="modal-body py-0">
+        <div data-id="rp-students-not-joined" ng-show="!breakout.studentsAvailable">
+          <p>Students have not joined the session yet</p>
+        </div>
+        <div ng-show="breakout.studentsAvailable" class="breakwrapper">
+          <div class="text-timer-wrapper d-flex justify-content-between pt-3 pb-2">
+            <p>Drag and drop students to create breakout session</p>
+            <div data-id="rp-select-time" class="selecttimer">
+              <select ng-model="breakout.timeSlot" ng-disabled="breakout.isRunning" class="pull-right">
+                <option data-id="rp-select-slot" value="-1">Select time slot</option>
+                <option data-id="rp-1-min" value="1">1 min</option>
+                <option data-id="rp-2-min" value="2">2 mins</option>
+                <option data-id="rp-5-min" value="5">5 mins</option>
+                <option data-id="rp-0-min" value="0">unlimited mins</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <ul dnd-list="breakout.students" dnd-drop="breakout.dropToOriginalRoom(event, index, item, external, type)" class="user-tiles align-content-start d-flex flex-wrap col-sm-8 mb-0">
+              <li ng-repeat="student in breakout.students | orderBy: 'joinedTime' | limitTo: 8" ng-if="student.joined" dnd-disable-if="!student.online || !student.isAvailableBreakout" dnd-draggable="student" dnd-effect-allowed="move" class="user-tile px-0">
+                <div>
+                  <div ng-class="{'turnoff-bg': student.online &amp;&amp; student.isAvailableBreakout, 'logoff-bg': !student.online,'breakout-added':student.online &amp;&amp; !student.isAvailableBreakout}" class="turnoff-video-wrapper breakout">
+                    <div class="profile-picture"><img ng-show="student.online &amp;&amp; student.photoUri != null" ng-src="{{student.photoUri}}"/><span ng-show="student.photoUri == null &amp;&amp; student.online" class="username-substring">{{(student.firstName | firstletter) + (student.lastName | firstletter) }}</span><i ng-show="!student.online" class="dc-icon dc-user-avatar"></i>
+                      <!--img(ng-src="{{student.photoUri}}" ng-show="student.photoUri != null", draggable='false')-->
+                    </div>
+                    <!--i(data-id="rp-br-user-avatar" , ng-show="student.photoUri == null").dc-icon.student-avatar-size.dc-avatar-->
+                    <p data-id="rp-br-user-name" data-ng-bind="student.firstName | characters:15 : false" class="user-name col-md-12 no-gutter"></p>
+                  </div><span ng-if="!student.isAvailableBreakout" class="pos-abs"><span ng-class="'room-group-' + student.breakoutRoom"></span><i class="link-icon dc-icon dc-link"></i></span>
+                </div>
+              </li>
+            </ul>
+            <div id="room-container" class="col-sm-4">
+              <div ng-repeat="room in breakout.rooms track by $index" class="panel panel-default breakout-room">
+                <div ng-class="'room-group-' + room.id" class="panel-heading">
+                  <h5 data-id="rp-room-title" ng-bind="room.title" class="panel-title"></h5><span class="pos-abs"><span ng-class="'room-group-' + room.id"></span><i class="link-icon dc-icon dc-link"></i></span>
+                </div>
+                <div class="panel-body">
+                  <ul dnd-list="room.users" dnd-drop="breakout.dropToBreakoutRoom(event, index, item, external, type,$index,room)" dnd-disable-if="room.users.length &gt;= 4" style="height:30px;" class="breakout-room-gems row no-gutter mb-0">
+                    <li ng-repeat="user in room.users track by $index" dnd-draggable="user" class="breakout-room-gem-wrapper col-sm-3">
+                      <div ng-attr-title="{{user.firstName}}" class="breakout-room-gem"><i class="dc-icon dc-user-avatar gem-avatar"></i></div>
+                    </li>
+                  </ul>
+                  <ul class="placeholders row list-unstyled mb-0">
+                    <li ng-repeat="n in [0,1,2,3]" class="breakout-room-gem-wrapper col-sm-3">
+                      <div class="breakout-room-gem col-sm-3"></div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <button ng-click="breakout.toggleRooms()" ng-disabled="(breakout.isDisabled &amp;&amp; !breakout.isRunning) || (breakout.timeSlot &gt; -1 ? false : true)" disable-right-click="disable-right-click" class="btn btn-primary btn-breakout"> {{ breakout.isRunning ? 'END BREAKOUT' : 'START BREAKOUT' }}</button>
+      </div>
+    </div>
+  </div>
+</div>

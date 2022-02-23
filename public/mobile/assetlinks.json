@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.wallstreetenglish.dc",
+    "sha256_cert_fingerprints":
+    ["08:9D:7B:A0:32:79:21:76:3F:83:63:63:68:2B:15:7A:9E:5C:58:2C:F6:87:9B:A7:04:78:63:4D:95:64:51:97"]
+  }
+}]

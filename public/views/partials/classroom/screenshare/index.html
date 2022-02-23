@@ -1,0 +1,106 @@
+
+
+<div ng-show="screenshareCtrl.currentUser.role == 'teacher'" class="screenshare">
+  <div class="shareshare-plugin-notification-container" ng-if="screenshareCtrl.showPluginNotification">
+    <div class="plugin-notification-wrapper">
+      <i class="dc-icon dc-warning"></i>
+      <span>Please</span>
+      <a class="links" href="https://chrome.google.com/webstore/detail/wse-dc-screen-sharing/pahhhcpdpgopkpgaemgdckngokjanlof" target="_blank" ng-click="screenshareCtrl.closeScreenShareNotification()">install</a>
+      <span>our Screenshare Extension to share your screen</span>
+      <button class="close" type="button" aria-label="Close" ng-click="screenshareCtrl.closeScreenShareNotification()"><span aria-hidden="true">×</span></button>
+    </div>
+  </div>
+  <div class="ss_content">
+    <div class="ss_container">
+      <div class="sshare_animation">
+        <div class="sshare_core">
+          <div class="sshare_header">
+            <div class="sshare_control"></div>
+          </div>
+          <div class="sshare_body">
+            <div class="sshare_container">
+              <div data-id="rp-md-circle-rotate" ng-class="{'started': screenshareCtrl.screenshareRunning}" class="sshare_circle"></div>
+              <div data-id="rp-content1" class="sshare_content">
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+          </div>
+          <div class="sshare_footer">
+            <div class="sshare_top"></div>
+            <div class="sshare_bottom"></div>
+          </div>
+        </div>
+        <div class="sshare_core">
+          <div class="sshare_header">
+            <div class="sshare_control"></div>
+          </div>
+          <div class="sshare_body">
+            <div class="sshare_container">
+              <div data-id="rp-sm-circle-rotate" ng-class="{'started': screenshareCtrl.screenshareRunning}" class="sshare_circle"></div>
+              <div data-id="rp-content2" class="sshare_content">
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+          </div>
+          <div class="sshare_footer">
+            <div class="sshare_top"></div>
+            <div class="sshare_bottom"></div>
+          </div>
+        </div>
+        <div data-id="rp-share-arrow" class="sshare_arrow"></div>
+      </div>
+      <div class="ss_buttons">
+        <button data-id="rp-start-sharing"
+                ng-click="screenshareCtrl.shareScreen()"
+                ng-show="!screenshareCtrl.screenshareRunning && screenshareCtrl.currentUser.role === 'teacher'"
+                ng-disabled="screenshareCtrl.disableShare"
+                class="btn btn-primary button-2 share-button">
+                {{screenshareCtrl.disableShare ? 'Initializing...' : 'Share Screen'}}
+        </button>
+        <button data-id="rp-stop-sharing"
+                ng-click="screenshareCtrl.stopSharing()"
+                ng-show="screenshareCtrl.currentUser.role == 'teacher' && screenshareCtrl.screenshareRunning"
+                class="btn btn-primary button-2 share-button">
+            Stop sharing
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-if="screenshareCtrl.currentUser.role === 'teacher' && screenshareCtrl.rtcProvider === screenshareCtrl.RTC_PROVIDER.zoom" class="screenshare-wrapper">
+  <div class="screen-sharing-wrapper">
+    <div id="ot-zoom-screen-sharing">
+      <video ng-if="screenshareCtrl.supportedWebCodes" id="video-canvas" class="video-canvas" width="1280" height="640"></video>
+      <canvas ng-if="!screenshareCtrl.supportedWebCodes" id="video-canvas" class="video-canvas" width="1280" height="640"></canvas>
+    </div>
+  </div>
+</div>
+
+<div ng-show="screenshareCtrl.currentUser.role != 'teacher'" class="screenshare-wrapper" id="screenshare-wrapper-student">
+  <div id="screen-share-offline">
+    <span ng-show="screenshareCtrl.currentUser.role != 'teacher' && screenshareCtrl.teacher.online == false"
+    class="annotation_msg screenshare-offline">
+      Please wait for the teacher to return
+    </span>
+    <span ng-show="screenshareCtrl.teacher.online == true " class="annotation_msg yetToShare">Teacher will be sharing the screen now</span>
+    <div class="loader_new" ng-show="screenshareCtrl.teacher.online == true">
+      <div class="loader"></div>
+    </div>
+  </div>
+ 
+
+  <div class="screen-sharing-wrapper">
+    <div class="ot-wrapper" id="ot-zoom-screen-sharing-student" ng-if="screenshareCtrl.currentUser.role === 'student' && screenshareCtrl.rtcProvider === screenshareCtrl.RTC_PROVIDER.zoom">
+      <canvas id="video-canvas-screen-view" class="video-canvas" width="100" height="100"></canvas>
+    </div>
+    <div class="ot-wrapper" id="ot-publisher-screen-sharing" ng-if="screenshareCtrl.currentUser.role === 'teacher'">
+    </div>
+    <div class="ot-wrapper" ng-class="{'ot-enablex': screenshareCtrl.rtcProvider === screenshareCtrl.RTC_PROVIDER.zoom}" id="ot-subscriber-screen-sharing">
+    </div>
+  </div>
+</div>

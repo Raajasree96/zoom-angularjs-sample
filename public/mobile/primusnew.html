@@ -1,0 +1,405 @@
+
+<!doctype html>
+<html>
+<head>
+    <script src="/primus/primus.js"></script>
+    <script>
+         console.log("page loaded");
+
+         var host = window.location.protocol + '//' + window.location.host;
+         var url = host;
+         var primus;
+          var isSubcribed = false;
+            var isJoined = false;
+            var _lastMsgId = 0;
+            var _activityId = "";
+            var _userId = "";
+            var _reconnected = false;
+            var _reconnecting = false;
+         function setupWebViewJavascriptBridge(callback) {
+             if (window.WebViewJavascriptBridge) { return callback(WebViewJavascriptBridge); }
+             if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
+             window.WVJBCallbacks = [callback];
+             var WVJBIframe = document.createElement('iframe');
+             WVJBIframe.style.display = 'none';
+             WVJBIframe.src = 'wvjbscheme://__BRIDGE_LOADED__';
+             document.documentElement.appendChild(WVJBIframe);
+             setTimeout(function() { document.documentElement.removeChild(WVJBIframe) }, 0)
+         }
+
+         setupWebViewJavascriptBridge(function(bridge) {
+            bridge.registerHandler('openSocket', function(data, responseCallback) {
+                 console.log(data);
+                 var obj = JSON.parse(data);
+                 open(obj.activityId,obj.studentId,obj.lastMsgId);
+                  var responseData = { 'Javascript Says':'Right back atcha!' }
+                  responseCallback(responseData)
+            });
+
+            bridge.registerHandler('joinMe', function(data, responseCallback) {
+                 console.log(data);
+                 var obj = JSON.parse(data);
+                 joinMe(obj.activityId,obj.studentId);
+            });
+
+            bridge.registerHandler('muteMic', function(data, responseCallback) {
+                 console.log(data);
+                 var obj = JSON.parse(data);
+                 muteMic(obj.status,obj.studentId,obj.activityId);
+            });
+
+            bridge.registerHandler('muteCam', function(data, responseCallback){
+                console.log(data);
+                var obj = JSON.parse(data);
+                muteCam(obj.status,obj.studentId,obj.activityId)
+            });
+
+            bridge.registerHandler('appLogout', function(data, responseCallback){
+                 var obj = JSON.parse(data);
+                 appLogout(obj.uid,obj.activityId);
+            });
+
+            bridge.registerHandler('handrise',function(data, responseCallback)
+            {
+                var obj = JSON.parse(data);
+                handrise(obj.uid,obj.activityId,obj.shouldPublish,obj.status);
+            });
+            bridge.registerHandler('subscribe',function(data,responseCallback){
+                var obj = JSON.parse(data);
+                subscribe(obj.activityId,obj.studentId,obj.lastMsgId);
+            });
+
+            bridge.registerHandler('endPrimus', function(data, responseCallback){
+                  endPrimus();
+            });
+
+         });
+
+        function open (activityId, userId, lastMsgId) {
+          console.log("open activityId-"+activityId+" userId-"+userId);
+            primus = new Primus(url, { strategy: 'online, timeout, disconnect' });
+
+            primus.on('open', function () {
+                      console.log("Connection open");
+                      console.log("lastMsgId"+lastMsgId);
+                      _lastMsgId = lastMsgId;
+                   subscribeUser(activityId,userId,_lastMsgId);
+                   if (!isJoined) {
+                       setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , JSON.parse('{"key":"connected","event":"connected"}'));
+                       });
+                       isJoined = true;
+                   }
+                   primus.on("user:joined" , function(msg) {
+                       setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                       });
+                   });
+
+                   primus.on("change-screen" , function(msg) {
+                        setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                        });
+                   });
+
+                   primus.on("wb:add-annotation" , function(msg) {
+                        setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                        });
+                   });
+
+                   primus.on("wb:remove-annotation" , function(msg) {
+                         setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                         });
+                    });
+
+                   primus.on("wb:clear-all" , function(msg) {
+                         setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                         });
+                    });
+
+                   primus.on("wb:add-board" , function(msg) {
+                         setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                         });
+                    });
+
+                   primus.on("wb:close-board" , function(msg) {
+                         setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                         });
+                    });
+
+                   primus.on("wb:open-board" , function(msg) {
+                         setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                         });
+                    });
+
+
+                   primus.on("wb:import-file" , function(msg) {
+                         setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                         });
+                   });
+
+                   primus.on("wb:ppt-action" , function(msg) {
+                          setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , msg);
+                          });
+                   });
+
+                   primus.on("wb:update-pointer" , function(msg) {
+                          setupWebViewJavascriptBridge(function(bridge) {
+                              bridge.callHandler('response' , msg);
+                          });
+                   });
+
+                   primus.on("wb:remove-pointer" , function(msg) {
+                          setupWebViewJavascriptBridge(function(bridge) {
+                             bridge.callHandler('response' , msg);
+                           });
+                   });
+
+                   primus.on("self:mute-cam" , function(msg) {
+                           setupWebViewJavascriptBridge(function(bridge) {
+                              bridge.callHandler('response' , msg);
+                           });
+                   });
+
+                   primus.on("self:mute-mic" , function(msg) {
+                            setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('response' , msg);
+                            });
+                   });
+
+                   primus.on("user:online" , function(msg) {
+                            setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('response' , msg);
+                            });
+                   });
+                   primus.on("end-session" , function(msg) {
+                            setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('response' , msg);
+                            });
+                   });
+
+                   primus.on("remote:mute-mic" , function(msg) {
+                        setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('response' , msg);
+                        });
+                   });
+
+                   primus.on("app:logout" , function(msg) {
+                            setupWebViewJavascriptBridge(function(bridge) {
+                                 bridge.callHandler('response' , msg);
+                            });
+                    });
+
+                   primus.on("remote:mute-all-mic" , function(msg) {
+                         setupWebViewJavascriptBridge(function(bridge) {
+                                 bridge.callHandler('response' , msg);
+                          });
+                   });
+
+                   primus.on('end', function() {
+                    _reconnected = false;
+                    _reconnecting = false;
+                    isSubcribed = false;
+                   setupWebViewJavascriptBridge(function(bridge) {
+                            bridge.callHandler('response' , JSON.parse('{"key":"end","event":"end"}'));
+                         });
+                            console.log("Connection closed");
+                   });
+                   primus.on('reconnect', function (msg) {
+                        console.log("primus reconnect");
+                          setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('reconnect' , msg);
+                            });
+                        _reconnected = false;
+                        _reconnecting = false;
+                    });
+
+                    primus.on('reconnect scheduled', function (msg) {
+                        console.log("primus reconnect scheduled");
+                          setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('reconnect scheduled' , msg);
+                            });
+                    });
+
+                    primus.on('reconnected', function (msg) {
+                        console.log("primus reconnected");
+                        if (_reconnecting) {
+                           console.log("primus reconnected reconnecting");
+                        return;
+                        }
+                        if (!_reconnected && !_reconnecting) {
+                           console.log("primus reconnected Successful");
+                           console.log("_lastMsgId",_lastMsgId);
+                           _reconnecting = true;
+                           setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('reconnected' , msg);
+                            });
+                        }
+                    });
+
+                    primus.on('reconnect timeout', function (err, msg) {
+                        console.log("primus reconnect timeout");
+                          setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('reconnect timeout' , msg);
+                            });
+                    });
+
+                    primus.on('reconnect failed', function (err, msg) {
+                        console.log("primus reconnect failed");
+                          setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('reconnect failed' , msg);
+                            });
+                    });
+                     primus.on('handrise:update', function (msg) {
+                        console.log("handrise"+msg);
+                          setupWebViewJavascriptBridge(function(bridge) {
+                                bridge.callHandler('response' , msg);
+                            });
+                    });
+                    primus.on('error', function error(err) {
+                             console.error('Something horrible has happened', err.stack);
+                    });
+
+
+                   primus.on('data', function(msg) {
+                      msg = (msg.data && msg.data.length > 1) ? msg.data[1] : msg;
+                        if(msg.event) {
+                          console.log("[PRIMUS] Published Message recieved :: ", msg);
+                             _lastMsgId = msg.id; // Update the last message id
+                              console.log("_lastMsgId",_lastMsgId);
+                        }
+                        else {
+                          console.log("[PRIMUS] Server Message recieved :: ", msg);
+                        }
+
+                  });
+
+              });
+
+            console.log('[PRIMUS] Connecting to exchange channel ', data);
+
+            primus.on("subscribe" , function() {
+              setupWebViewJavascriptBridge(function(bridge) {
+              reconnected = true;
+              _reconnecting = false;
+              bridge.callHandler('response',msg);
+             });
+            });
+      }
+
+      function subscribeUser(activityId,userId) {
+         console.log("subscribeUser"+isSubcribed);
+          if (!isSubcribed) {
+            // _lastMsgId = lastMsgId;
+            isSubcribed = true;
+                var data = {
+                    channel: activityId,
+                    userId: userId,
+                    userRole: "student",
+                    lastMsgId: _lastMsgId,
+                };
+              primus.send('subscribe', data);
+          }
+      }
+
+      function joinMe(activityId,userId) {
+          console.log("joinMe activityId-"+activityId+" userId-"+userId);
+          var data = {
+                        channel: activityId,
+                        userId: userId,
+                };
+
+                primus.send(event, {
+                    channel: activityId,
+                    key: "user:joined",
+                    event: "user:joined",
+                    data: data,
+                    publish: true
+                });
+                 _lastMsgId++;
+      }
+      function muteMic(status,userId,activityId) {
+            var data = {
+                status: status,
+                uid: userId
+            };
+            primus.send("self:mute-mic", {
+                        channel: activityId,
+                        key: "self:mute-mic",
+                        event: "self:mute-mic",
+                        data: data,
+                        publish: true
+                        });
+             _lastMsgId++;
+        }
+
+        function muteCam(status,userId,activityId) {
+            var data = {
+                status: status,
+                uid: userId,
+            };
+            primus.send("self:mute-cam", {
+                        channel: activityId,
+                        key: "self:mute-cam",
+                        event: "self:mute-cam",
+                        data: data,
+                        publish: true
+                        });
+             _lastMsgId++;
+        }
+
+        function appLogout(userId,activityId) {
+            var data = {
+                channel: activityId,
+                userId: userId
+            };
+            primus.send("app:logout", {
+                        channel: activityId,
+                        key: "app:logout",
+                        event: "app:logout",
+                        data: data,
+                        publish: true
+                        });
+             _lastMsgId++;
+
+        }
+
+         function handrise(userId,activityId,shouldPublish,status) {
+         console.log("handrise activityId-"+activityId+" userId-"+userId+" shouldPublish-"+shouldPublish+" status-"+status);
+            var data = {
+            publish: shouldPublish,
+            status: status,
+            userId: userId
+            };
+            primus.send("handrise:update", {
+                        channel: activityId,
+                        data: data,
+                        event: "handrise:update",
+                        key: "handrise:update",
+                        publish: shouldPublish
+                        });
+            _lastMsgId++;
+        }
+
+        function endPrimus() {
+            primus.end();
+            // _lastMsgId++;
+        }
+
+
+
+
+    </script>
+</head>
+<body>
+<ul id='messages'></ul>
+</body>
+</html>

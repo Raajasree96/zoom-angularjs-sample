@@ -1,0 +1,25 @@
+
+<div brand-header="brand-header"></div>
+<!-- <div brand-header></div> -->
+<div id="session-unavailable-page">
+  <div ng-if="autologinCtrl.isWelcome" class="instruction-container">
+    <div class="row">
+      <div class="col-lg-6 col-sm-6 col-md-6 col-xs-6 instruction_box">
+        <div class="text-center mbottom_20 animated profilePictureslideInDown"><span class="inblock"></span>
+          <div ng-show="autologinCtrl.userDp.display == true" class="profile-photo">
+            <img ng-src="{{autologinCtrl.userDp.url}}" sb-load="autologinCtrl.onImgLoad($event);"/>
+          </div>
+          <div ng-show="!autologinCtrl.userDp.url" class="username-substring">
+            <span>{{autologinCtrl.userDp.usernameSubstring}}</span>
+          </div>
+          <!--i.dc-icon.dc-user1(ng-show="userDp.display == false")-->
+        </div>
+        <h2 class="text-center animated slideInDown">{{autologinCtrl.userName | ucfirst}}</h2>
+        <p class="text-center animated slideInDown">Welcome to the Digital Classroom</p>
+        <p ng-if="autologinCtrl.showTimer &amp;&amp; autologinCtrl.userRole != 'teacher'" class="text-center animated slideInDown">
+          Session starts in <b>{{ autologinCtrl.remainingTime }}</b> minutes. Please wait.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

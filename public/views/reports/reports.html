@@ -1,0 +1,160 @@
+
+<div class="dc-session-reports-page">
+  <div class="reports-header-block">
+    <div>
+      <label class="title">Session Log</label>
+      <div class="input-block"><i class="dc-search report-search-icon" ng-click="searchSession()"></i>
+        <input type="text" placeholder="Search by Session ID, Teacher, Class Type" ng-model="searchString" ng-change="searchSession()" />
+      </div>
+    </div>
+  </div>
+
+  <div class="reports-body-block">
+
+      <div class="copied-notification">
+        Copied to Clipboard
+      </div>
+      <div class="reports-table-container">
+
+        <div class="session-header">
+          <span class="table-cell">Date</span>
+          <span class="table-cell">Teacher</span>
+          <span class="table-cell">Class Type</span>
+          <span class="table-cell">Slot</span>
+          <span class="table-cell">Session ID</span>
+          <span class="table-cell">Provider</span>
+          <span class="table-cell">Provider ID</span>
+        </div>
+
+        <div class="session-body-container" ng-if="sessionList.length > 0">
+
+          <div class="session-body" ng-click="getSessionDetails($index, session)" ng-repeat-start="session in sessionList" ng-class="{'selected-session': ($index === selectedSessionRecord.index)}">
+
+            <div class="table-cell">{{session.date}}</div>
+            <div class="table-cell">{{session.dcAppData.teacher.firstName}} {{session.dcAppData.teacher.lastName}}</div>
+            <div class="table-cell">{{session.classTypeName}}
+              <span ng-if="session.centerType === 'VIP'" class="fa fa-star student-type-icon"></span>
+            </div>
+            <div class="table-cell slot">{{session.slot.from}} - {{session.slot.to}}</div>
+            <div class="table-cell">
+              <i class="dc-copy" ng-click="copyOTsessionid($event)"></i>
+              <span class="dc-session-id">
+                <div class="tooltip">
+                  {{session.id}}
+                </div>
+                {{session.id}}
+              </span>
+            </div>
+            <div class="table-cell">{{getProviderName(session.dcAppData.session, session.dcAppData.rtcServiceProvider)}}</div>
+            <div class="table-cell">
+              <i class="dc-copy" ng-click="copyOTsessionid($event)"></i>
+              <span class="ot-session-id">
+                <div class="tooltip">
+                  {{getProviderId(session.dcAppData.session, session.dcAppData.rtcServiceProvider)}}
+                </div>
+                {{getProviderId(session.dcAppData.session, session.dcAppData.rtcServiceProvider)}}
+              </span>
+            </div>
+            <i class="dc-right-arrow toggle-arrow"></i>
+          </div>
+
+          <div class="session-information" ng-repeat-end="session in sessionList" ng-if="($index === selectedSessionRecord.index)">
+
+              <div class="session-information-header">
+                <div class="table-cell">Status</div>
+                <div class="table-cell">Participants</div>
+                <div class="table-cell">Device Info</div>
+                <div class="table-cell">Session Log</div>
+              </div>
+
+              <div class="session-information-body"
+                   ng-repeat="participant in session.participants"
+                   ng-click="showAllLoginDevice($index, participant)"
+                   ng-class="{'selected-participant': ($index === selectedSessionRecord.participantIndex)}">
+                <div class="table-cell"><span class="joined-status" ng-if="participant.loginDetails.length > 0">Joined</span></div>
+                <div class="table-cell">{{participant.firstName}} {{participant.lastName}}</div>
+                <div class="table-cell device-info">
+
+                  <div class="device" ng-repeat="login in participant.loginDetails | limitTo: participant.deviceLimitToShow ? participant.deviceLimitToShow : 1">
+                    <span>
+                      <i class="dc-icon-mac-pc" ng-show="login.osName === 'mac os x'"></i>
+                      <i class="dc-icon-windows-pc" ng-show="login.osName === 'windows'"></i>
+                      <i class="dc-icon-linux-pc" ng-show="login.osName === 'linux'"></i>
+                      <i class="dc-icon-iphone" ng-show="login.osName === 'iphone'"></i>
+                      <i class="dc-icon-iphone" ng-show="login.osName === 'android'"></i>
+                      {{login.osName}} {{login.osVersion}}
+                    </span>
+                    <span>
+                      <i class="dc-icon-chrome" ng-show="login.browserName === 'chrome'"></i>
+                      <i class="dc-icon-safari" ng-show="login.browserName === 'safari'"></i>
+                      <i class="dc-icon-firefox" ng-show="login.browserName === 'firefox'"></i>
+                      {{login.browserName || login.deviceType}} {{login.browserVersion || login.dcAppReleaseVersion}}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="table-cell">
+                  <div class="pipe" ng-show="participant.totalIdleAndActivePeriod">
+                    <!-- ng-if="(data.durationCalculatedForHundred > 0)" -->
+                    <span class="highlight {{data.status}}" ng-repeat-start="data in participant.totalIdleAndActivePeriod" style="width: {{data.durationCalculatedForHundred}}%">
+                      <span class="tooltiptext">{{data.period}}</span>
+                    </span>
+                    <!-- ng-if="(data.durationCalculatedForHundred > 0 || !$last || $first)" -->
+                    <span class="divider" ng-repeat-end="data in participant.totalIdleAndActivePeriod"></span>
+                  </div>
+                </div>
+
+                <i class="dc-right-arrow toggle-arrow" ng-show="participant.loginDetails.length > 1"></i>
+              </div>
+          </div>
+        </div>
+
+        <div class="no-records-found" ng-if="sessionList.length <= 0">
+          <h1>No Records Found</h1>
+        </div>
+
+        <div class="report-loader-container" ng-show="showLoader">
+          <div class="loader">
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__ball"></div>
+          </div>
+          <div class="">
+            Loading...
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pagination-block" ng-hide="sessionList.length == 0 && searchString.length > 0">
+        <ul class="my-pagination">
+          <li ng-click="goToFirstPage()" ng-class="{'disabled': currentPage <= 1}">
+            <a>First</a>
+          </li>
+          <li ng-click="goToPrevPage()" ng-class="{'disabled': currentPage <= 1}">
+            <a><i class="dc-arrow-left"></i></a>
+          </li>
+          <li>
+            <a>
+              <input type="text" name="" ng-model="currentPage" ng-change="getPageNo()" />
+              <span>of {{totalPages}} </span>
+            </a>
+          </li>
+          <li ng-click="goToNextPage()" ng-class="{'disabled': currentPage >= totalPages}">
+            <a>
+              <i class="dc-arrow-right"></i>
+            </a>
+          </li>
+          <li ng-click="goToLastPage()" ng-class="{'disabled': currentPage >= totalPages}">
+            <a>Last</a>
+          </li>
+
+        </ul>
+      </div>
+
+  </div>
+
+</div>

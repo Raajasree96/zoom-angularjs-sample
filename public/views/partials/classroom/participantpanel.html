@@ -1,0 +1,140 @@
+
+<section id="participant-panel" class="panel-container text-center"><span ng-if="$root.remainingTime" class="participantpanel-timer">{{$root.remainingTime}}</span>
+  <div id="participants-container" class="col-lg-12 col-md-12 no-padding participant-container">
+    <div data-id="rp-participants" ng-if="participantJoinedCount == 0 &amp;&amp; currentUser.role == 'teacher'" class="no-participants">
+      <div class="msg-wrapper text-center">
+        <p class="mb-2">You are the first participant in the session.</p>
+        <p>Please wait for others to join.</p>
+      </div>
+    </div>
+    <!-- condition here for zoom classes alone -->
+    <canvas ng-if="rtcProvider === RTC_PROVIDER.zoom" id="video-canvas-participants" class="video-canvas" width="100" height="100" style="background-color: transparent; position: absolute; left: 0;"></canvas>
+    <div data-id="rp-participants" class="participant-tiles-container" ng-style="participantJoinedCount !== 0 && {'background-color':'#A9A9A9'}">
+
+      <div class="part-wrapper" ng-repeat="user in students | orderBy: 'joinedTime' | filter: joinedFilter" id="participant-tile-wrapper">
+        <div class="participant-tile" ng-click="connectBreakout()" ng-show="user.joined" style="width: 100%">
+          <div class="participant-tile user-participant-tile" id="{{user.id}}-participant-tile" ng-show="user.joined">
+
+            <div class="stream-loader ot-loader"
+                 ng-if="getLoaderStatus()">
+              <div class="ot-spinner"></div>
+            </div>
+
+            <div class="user-away-container" ng-show="user.online && user.isAway && currentUser.role == 'teacher'">
+              <i title="User Away" class="dc-icon dc-user-away-black"></i>
+            </div>
+
+            <div class="ot-notification ot-privilege-notification" ng-show="user.id == privilegeUser.id && user.role == 'student'">
+              <i class="dc-icon dc-pencil"></i>
+            </div>
+
+            <div ng-show="(!user.isAvailableBreakout || user.role == 'teacher') && user.breakoutRunning && user.online && (user.breakoutRoom != null)"
+                 class="ot-breakout-notification {{'room-group-' + user.breakoutRoom}}">
+              <i class="link-icon dc-icon dc-link"></i>
+            </div>
+
+            <div title="Hand-raise"  ng-click="triggerHandrise(user)" class="ot-control ot-handrise-control"
+                 ng-show="(currentUser.id == user.id || (user.handRised && currentUser.role == 'teacher')) && user.id != privilegeUser.id && !user.expelled && user.online"
+                 ng-class="{'hand-rised': (user.handRised && currentUser.role == 'student'), 'teacher': currentUser.role != 'student'}">
+              <i class="dc-icon dc-handrise"></i>
+            </div>
+
+            <div class="ot-control ot-resolution-control" ng-if="rtcProvider === RTC_PROVIDER.opentok && currentUser.camAvailable && currentUser.camEnabled && (currentUser.id === user.id) && user.online && currentUser.camClickable">
+              <i class="dc-icon dc-settings" title="Video quality" tabindex="-1" ng-click="toggleResolutionOptions()"></i>
+              <ul class="resolution-options animated fadeIn" ng-show="resolution.showOptions">
+                <li ng-repeat="option in resolution.options | orderObjectBy: 'label' : true"
+                    ng-class="{ active : (option.key == resolution.active.key)}"
+                    ng-click="changeResolution(option)">
+                  <span ng-title="option.title">
+                    {{ option.label }}
+                    <span class="resolution">{{ (option.key == 'HD') ? ' HD' : '' }}</span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="ot-wrapper" id="{{user.id}}-ot-subscriber-video-container-classroom">
+            </div>
+
+            <!-- the profile image when the video is turned off, the offline image is also this div -->
+            <div
+              id="{{user.id}}-no-video-wrapper"
+              class="no-video-wrapper student-avatar"
+              ng-class="{ 'offline' : !user.online, 'expelled': (user.expelled && currentUser.role === 'teacher') }">
+
+                <!-- <div class="stream-loader ot-loader" ng-show="!currentUser.publisherCreated && user.online">
+                  <div class="ot-spinner"></div>
+                </div> -->
+
+                <div class="profile-photo" ng-hide = "(user.expelled && currentUser.role == 'teacher')"
+                     style="height: {{ (profileAvatar.studentProfilePicSize ? profileAvatar.studentProfilePicSize : 66) }}px; width: {{ (profileAvatar.studentProfilePicSize ? profileAvatar.studentProfilePicSize : 66) }}px;"
+                     ng-class="{diagnosticsDp: diagnose == 'true'}"
+                >
+                  <img ng-src="{{user.photoUri}}" ng-show="user.photoUri != null">
+                  <div ng-show="user.photoUri == null" class="username-substring">
+                    <span>{{(user.firstName | firstletter) + (user.lastName | firstletter)}}</span>
+                  </div>
+                </div>
+
+                <div class="offline-avatar"
+                     ng-show="(!user.online && !user.expelled) || (user.expelled && currentUser.role !== 'teacher')"
+                     style="height: {{ (profileAvatar.studentProfilePicSize ? profileAvatar.studentProfilePicSize : 66) }}px; width: {{ (profileAvatar.studentProfilePicSize ? profileAvatar.studentProfilePicSize : 66) }}px;"
+                     ng-class="{diagnosticsDp: diagnose == 'true'}"
+                >
+                    <i class="dc-icon dc-user-avatar"></i>
+                </div>
+
+                <i ng-show="user.expelled && currentUser.role == 'teacher'" style="font-size: 37px;" class="dc-icon dc-block"></i>
+
+            </div>
+
+            <div class="audio-level-meter" ng-if="rtcProvider === RTC_PROVIDER.opentok && currentUser.id == user.id && currentUser.micEnabled && currentUser.micAvailable && user.online">
+                <ul data-id="rp-audio-indicators" class="audio-indicators" style="list-style-type: none">
+                  <li ng-class="{ active : (publisherAudioValues.level > 0.77) && (publisherAudioValues.userId == user.id)}">
+                  </li>
+                  <li ng-class="{ active : (publisherAudioValues.level > 0.55) && (publisherAudioValues.userId == user.id)}">
+                  </li>
+                  <li ng-class="{ active : (publisherAudioValues.level > 0.33) && (publisherAudioValues.userId == user.id)}">
+                  </li>
+                </ul>
+            </div>
+
+            <div class="audio-level-meter" ng-if="(currentUser.id != user.id) && user.online && user.micAvailable">
+                <ul data-id="rp-audio-indicators" class="audio-indicators" style="list-style-type: none" ng-if="rtcProvider === RTC_PROVIDER.opentok && user.micEnabled">
+                  <li ng-class="{active: ((subscriberAudioValues[user.id].level > 0.77) && (subscriberAudioValues[user.id].userId == user.id))}">
+                  </li>
+                  <li ng-class="{active: ((subscriberAudioValues[user.id].level > 0.55) && (subscriberAudioValues[user.id].userId == user.id))}">
+                  </li>
+                  <li ng-class="{active: ((subscriberAudioValues[user.id].level > 0.33) && (subscriberAudioValues[user.id].userId == user.id))}">
+                  </li>
+                </ul>
+                <div class="ot-mic-control" ng-if="!user.micEnabled && user.online && user.micAvailable && !user.expelled" ng-class="{'mic-inactive': !user.micEnabled}">
+                  <i class="dc-icon dc-mic-slash"></i>
+                </div>
+            </div>
+            <div class="ot-username">
+              <p ng-class="{'blocked': (user.expelled && currentUser.role == 'teacher')}">{{ (user.firstName + ' ' + user.lastName) | ucfirst }}</p>
+            </div>
+
+            <div class="mute-and-expel-action-menu"
+                 ng-if="currentUser.role == 'teacher' && user.online"
+                 ng-class="{'teacher':(!stream.hasVideo &amp;&amp; currentUser.role != 'student'),'novideo':(!stream.hasVideo &amp;&amp; currentUser.role != 'teacher')}">
+              <div class="dropup" ng-mouseenter="showActionMenu($event, user)" ng-mouseleave="hideActionMenu($event, user)">
+                <i class="dc-icon dc-dc-arrow-down"></i>
+                <ul class="dropdown-menu" ng-show="user.toggleActionMenu">
+                  <li ng-show="user.micAvailable" ng-click="toggleMicRemote($event, user)">{{ (!user.micEnabled) ? 'Unmute' : 'Mute' }}</li>
+                  <li ng-click="expel.togglePopup(user,currentUser.role)">
+                    Expel
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>

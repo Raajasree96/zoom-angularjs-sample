@@ -1,0 +1,226 @@
+<div ng-intro-options="IntroOptions" ng-intro-autorefresh="true" ng-intro-method="startTour" ng-intro-onchange="ChangeEvent" ng-intro-autostart="false" style="height:100%" ng-intro-exit-method="exit">
+  <!-- Presenter bar (HEADER of the app)-->
+  <header ui-view="presenterbar" class="page-header">{{data-aud}} {{data-meta}}</header>
+  <ul user-notifications="user-notifications" ng-if="user.role == 'teacher'" class="joinstudent"></ul>
+  <ul bandwidth-notifications="bandwidth-notifications" class="bandwidth-warning"></ul>
+  <!-- POPUPS will be displayed here -->
+  <div ng-show="showDiagnosticPopup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: block;" class="modal">
+    <div role="document" class="modal-dialog animated fadeIn d-flex justify-content-center">
+      <div class="modal-content col-sm-8 col-xs-8 settings-mobile animated fadeInDown">
+        <div class="modal-header">
+          <h4 data-id="rp-settings-title" id="myModalLabel" class="modal-title">Settings</h4>
+          <button type="button" data-dismiss="modal" aria-label="Close" ng-click="closeDiagnosticPopup()" disable-right-click="disable-right-click" class="close"><span aria-hidden="true" data-id="rp-seetings-close">×</span></button>
+        </div>
+        <div class="modal-body">
+          <!-- Device settings directive will be injected here-->
+          <div class="device-container dc_video_block">
+            <div style="text-align: center; top: 5px" class="device-notification animated fadeInDown" ng-if="(!activeAudioDevice || !activeVideoDevice || getUserMediaError)">
+              <span ng-if="!activeAudioDevice && activeVideoDevice">Microphone not connected</span>
+              <span ng-if="!activeVideoDevice && activeAudioDevice">Camera not connected</span>
+              <span ng-if="((!activeVideoDevice && !activeVideoDevice) || getUserMediaError)">Devices not found</span>
+            </div>
+            <div style="overflow:hidden" class="test-stream camera-preview-video settings-video-container">
+              <!-- Show for enablex class if it is not an audio only class, shows for opentok default. -->
+              <div ng-show="rtcProvider === RTC_PROVIDER.opentok" id="settings-video-wrapper" ng-class="'res-' + pubRes" class="ot-wrapper">
+              </div>
+
+              <video ng-if="rtcProvider === RTC_PROVIDER.zoom" id="localVideo-preview" width="160" height="120"></video>
+
+              <div class="no-video-wrapper" ng-if="!isPreviewVideoStarted"
+                   ng-class="{'offline' : !currentUser.online, 'show-avatar': !currentUser.camEnabled }">
+                <div class="profile-photo"ng-class="{diagnosticsDp: diagnose == 'true'}">
+                  <img ng-src="{{currentUser.photoUri}}" ng-show="currentUser.photoUri != null">
+                  <div class="username-substring" ng-show="currentUser.photoUri == null">
+                    <span>{{(currentUser.firstName | firstletter) + (currentUser.lastName | firstletter)}}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="audio-level-meter" ng-if="rtcProvider === RTC_PROVIDER.opentok && currentUser.online && currentUser.micAvailable && currentUser.micEnabled">
+                  <ul data-id="rp-audio-indicators" class="audio-indicators" style="list-style-type: none">
+                    <li ng-class="{active:publisherAudioValues.level > 0.77 && publisherAudioValues.userId == user.id}">
+                    </li>
+                    <li ng-class="{active:publisherAudioValues.level > 0.55 && publisherAudioValues.userId == user.id}">
+                    </li>
+                    <li ng-class="{active: (publisherAudioValues.level > 0.33 && publisherAudioValues.userId == user.id)}">
+                    </li>
+                  </ul>
+              </div>
+            </div>
+            <!-- MICROPHONE-->
+            <div tabIndex="-1" ng-blur="closeDeviceSelection()" class="system-device">
+              <div data-id="rp-settings-mic" ng-click="toggleDevices('mic')" class="current-device-wrapper d-flex dropdown" ng-class="{disable : (!activeAudioDevice || getUserMediaError)}">
+                <i class="dc-icon dc-mic pull-left device-icon"> </i>
+                <span class="device-current" ng-show="!getUserMediaError"> {{activeAudioDevice.label}} </span>
+                <i class="dc-icon dc-updown-caret pull-right"></i>
+                <ul ng-show="toggleMicOptions && !getUserMediaError" class="dropdown-menu device-list">
+                  <li ng-repeat="device in audioInputDevices" ng-click="getSelectedDevice(device)">
+                    <a class="dropdown-item"> {{device.label}} </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- CAMERA-->
+            <div data-id="rp-settings-cam" tabIndex="-1" ng-blur="closeDeviceSelection()" class="system-device">
+              <!-- Show for enablex class if it is not an audio only class, shows for opentok default. -->
+              <div ng-show="(rtcProvider === RTC_PROVIDER.zoom) || rtcProvider === RTC_PROVIDER.opentok" ng-click="toggleDevices('camera')" class="current-device-wrapper d-flex dropdown" ng-class="{'disable' : (!activeVideoDevice || getUserMediaError)}">
+                <i class="dc-icon dc-video pull-left device-icon"> </i>
+                <span class="device-current" ng-show="!getUserMediaError"> {{activeVideoDevice.label}} </span>
+                <i class="dc-icon dc-updown-caret pull-right"></i>
+                <ul ng-show="toggleCameraOptions && !getUserMediaError" class="dropdown-menu device-list">
+                  <li ng-repeat="device in videoInputDevices" ng-click="getSelectedDevice(device)">
+                    <a class="dropdown-item"> {{device.label}} </a>
+                  </li>
+                </ul>
+              </div>
+              <div sample-audio="sample-audio" stopaudio="stopAud"> </div>
+            </div>
+            <div class="continue-wrapper">
+              <div data-ng-click="closeDiagnosticPopup()" disable-right-click="disable-right-click" class="btn btn-primary button-2">Continue</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="md-overlay"></div>
+  </div>
+
+  <main class="page-content">
+    <div ng-show="sessionConnected && showDevicenotifcation" class="device-error-bubble animated fadeInRight">
+      <button type="button" data-dismiss="modal" aria-label="Close" ng-click="closeDeviceError()" disable-right-click="disable-right-click" class="close"><span aria-hidden="true">×			</span></button>
+      <div ng-show="sessionConnected && activeVideoDevice != '' && activeAudioDevice == ''" class="errorwrapper"><span class="icon-wrapper"><i class="dc-icon dc-mic"></i></span>
+        <div class="text-container">
+          <h4 class="error-title">Microphone not connected</h4>
+          <p class="error-text">Please check your &nbsp;<a ng-mousedown="toggleDiagnosticPopup();closeDeviceError();">settings</a>&nbsp; to fix it</p>
+        </div>
+      </div>
+      <div ng-show="sessionConnected && activeVideoDevice == '' && activeAudioDevice != ''"class="errorwrapper"><span class="icon-wrapper"><i class="dc-icon dc-webcam"></i></span>
+        <div class="text-container">
+          <h4 class="error-title">Camera not connected</h4>
+          <p class="error-text">Please check your&nbsp;<a ng-mousedown="toggleDiagnosticPopup();closeDeviceError();">settings</a>&nbsp;to fix it.</p>
+        </div>
+      </div>
+      <div ng-show="sessionConnected && activeVideoDevice == '' && activeAudioDevice == ''" class="errorwrapper"><span class="icon-wrapper"><i class="dc-icon dc-mic"></i></span>
+        <div class="text-container">
+          <h4 class="error-title">Devices not found</h4>
+          <p class="error-text">Please check your&nbsp;<a ng-mousedown="toggleDiagnosticPopup();closeDeviceError();">settings</a>&nbsp;to fix it.</p>
+        </div>
+      </div>
+    </div>
+    <section ng-show="activeScreen=='avchat'" class="av-panel" id="avchat-section">
+      <div class="not-joined"
+            style="z-index: 4;"
+            ng-if="((currentUser.role !== 'teacher') && (participantJoinedCount <= 1)) && !teacher.joined"
+      >
+        <p>You are the first participant in the session.</p>
+        <p>Please wait for others to join.</p>
+      </div>
+      <div ng-if="(!teacher.joined && participantJoinedCount > 1)" class="not-joined">
+        <p>Teacher has not joined the session yet.</p>
+        <p>Please wait for the teacher to join.</p>
+      </div>
+    </section>
+
+    <div id="video-dimensions" ng-style="videoDimensions"
+         class="pinned-view-wrapper for-{{activeScreen}} classroom-video-container"
+         ng-show="activeScreen !== 'screenshare' && teacher.joined && ((breakoutRunning && (teacher.breakoutRoom === currentUser.breakoutRoom)) || (!teacher.breakoutRunning && !currentUser.breakoutRunning) || currentUser.role === 'teacher')">
+
+      <div class="ot-control ot-resolution-control" ng-show="rtcProvider === RTC_PROVIDER.opentok && currentUser.camAvailable && currentUser.camEnabled && currentUser.id === teacher.id">
+        <i class="dc-icon dc-settings" title="Video quality" tabindex="-1" ng-click="toggleResolutionOptions()"></i>
+        <ul class="resolution-options animated fadeIn" ng-show="resolution.showOptions">
+          <li ng-repeat="option in resolution.options | orderObjectBy: 'label' : true"
+              ng-class="{ active : (option.key == resolution.active.key)}"
+              ng-click="changeResolution(option)">
+            <span ng-title="option.title">
+              {{ option.label }}
+              <span class="resolution">{{ (option.key == 'HD') ? ' HD' : '' }}</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="ot-breakout-notification {{'room-group-' + teacher.breakoutRoom}}"
+           ng-show="(!teacher.isAvailableBreakout) && teacher.breakoutRunning && teacher.online && (teacher.breakoutRoom != null)">
+        <i class="link-icon dc-icon dc-link"></i>
+      </div>
+
+      <!--  width="1280" height="640" -->
+      <div class="ot-wrapper" id="ot-publisher-video-container-classroom">
+      </div>
+
+
+      <div ng-if="rtcProvider === RTC_PROVIDER.zoom" id="canvas-wrapper" class="ot-wrapper" style="height:100%; width: 100%;">
+        <canvas id="video-canvas-teacher" class="video-canvas" width="100" height="100" style="background-color: transparent"></canvas>
+      </div>
+
+      <div class="no-video-wrapper teacher-avatar"
+           ng-class="{'offline' : !teacher.online, 'show-avatar': !teacher.camEnabled }">
+           <!-- condition here to display only during zoom class -->
+
+
+         <div class="profile-photo"
+             style="height: {{ (profileAvatar.teacherProfilePicSize ? profileAvatar.teacherProfilePicSize : (activeScreen === 'avchat') ? 150 : 66) }}px; width: {{ (profileAvatar.teacherProfilePicSize ? profileAvatar.teacherProfilePicSize : (activeScreen === 'avchat') ? 150 : 66) }}px;"
+             ng-class="{'for-avchat': activeScreen == 'avchat', 'for-whiteboard': activeScreen == 'whiteboard'}">
+          <img ng-src="{{teacher.photoUri}}" ng-show="teacher.photoUri != null">
+          <div ng-show="teacher.photoUri == null" class="username-substring">
+            <span>{{(teacher.firstName | firstletter) + (teacher.lastName | firstletter)}}</span>
+          </div>
+        </div>
+
+        <div ng-show="!teacher.online" class="offline-avatar" style="height: {{ (profileAvatar.teacherProfilePicSize ? profileAvatar.teacherProfilePicSize : (activeScreen === 'avchat') ? 150 : 66) }}px; width: {{ (profileAvatar.teacherProfilePicSize ? profileAvatar.teacherProfilePicSize : (activeScreen === 'avchat') ? 150 : 66) }}px;" ng-class="{diagnosticsDp: diagnose == 'true'}">
+            <i class="dc-icon dc-user-avatar"></i>
+        </div>
+
+      </div>
+
+      <div class="ot-username" ng-show="activeScreen === 'whiteboard'">
+        <p>{{ (teacher.firstName + ' ' + teacher.lastName) | ucfirst }}</p>
+      </div>
+
+      <div class="audio-level-meter" ng-if="rtcProvider === RTC_PROVIDER.opentok && (currentUser.role == 'teacher') && teacher.online && teacher.micAvailable && teacher.micEnabled">
+          <ul data-id="rp-audio-indicators" class="audio-indicators">
+            <li ng-class="{active:publisherAudioValues.level > 0.77 && publisherAudioValues.userId == user.id}">
+            </li>
+            <li ng-class="{active:publisherAudioValues.level > 0.55 && publisherAudioValues.userId == user.id}">
+            </li>
+            <li ng-class="{active: (publisherAudioValues.level > 0.33 && publisherAudioValues.userId == user.id)}">
+            </li>
+          </ul>
+      </div>
+      <div class="audio-level-meter" ng-if="(currentUser.id != teacher.id) && teacher.online && teacher.micAvailable">
+          <ul data-id="rp-audio-indicators" class="audio-indicators" ng-show="rtcProvider === RTC_PROVIDER.opentok && teacher.micEnabled">
+            <li ng-class="{active: (subscriberAudioValues[teacher.id].level) > 0.99 && (subscriberAudioValues[teacher.id].userId == teacher.id)}">
+            </li>
+            <li ng-class="{active: (subscriberAudioValues[teacher.id].level) > 0.66 && (subscriberAudioValues[teacher.id].userId == teacher.id)}">
+            </li>
+            <li ng-class="{active: (subscriberAudioValues[teacher.id].level) > 0.33 && (subscriberAudioValues[teacher.id].userId == teacher.id)}">
+            </li>
+          </ul>
+          <div class="ot-mic-control" ng-if="!teacher.micEnabled && teacher.online && teacher.micAvailable" ng-class="{'mic-inactive': !teacher.micEnabled}">
+            <i class="dc-icon dc-mic-slash"></i>
+          </div>
+      </div>
+
+    </div>
+
+    <section ui-view="" class="main-panel"></section>
+    <!-- - Chat Widget-->
+    <!-- Calling text Chat directive: 'text-chat' directive-->
+    <section ui-view="chatpanel" text-chat="text-chat" class="chat-holder"></section>
+    <!-- - Assessment Widget-->
+    <section assessment="assessment" class="assessment-holder"></section>
+    <!-- - Participant Panel-->
+    <section ui-view="participantpanel"></section>
+    <!-- - Cms Content(Terms&Condition)-->
+    <section ui-view="termscondition"></section>
+    <!-- - Cms Content(Privacy Policy)-->
+    <section ui-view="privacypolicy"></section>
+    <!-- - Cms Content(Cookie Policy)-->
+    <section ui-view="cookiepolicy"></section>
+    <!-- - Expel Message Popup-->
+    <section ui-view="expelpopup"></section>
+  </main>
+
+  <section ui-view="teacherissuereport" ng-if="user.role == 'teacher'"></section>
+
+</div>

@@ -1,0 +1,23 @@
+
+<!-- <div brand-header></div> -->
+<div brand-header="brand-header"></div>
+<div id="session-unavailable-page">
+  <div class="instruction-container">
+    <div class="row">
+      <div class="col-lg-6 col-sm-6 col-md-6 col-xs-6 instruction_box">
+        <div class="text-center mbottom_20 animated slideInDown">
+          <span class="inblock"></span>
+          <i class="dc-icon dc-unavailable"></i>
+        </div>
+        <h2 class="text-center animated slideInDown">Session Unavailable</h2>
+        <p class="text-center animated slideInDown">The URL you are trying to access is invalid</p>
+        <p class="text-center animated slideInDown">please contact <a href="">admin</a></p>
+        <div ng-if="sessionUnavailableCtrl.callbackUrl">
+          <!--p.message Please wait for a few seconds. We are redirecting you to WallStreetEnglish home page.-->
+          <p class="loader-container"></p>
+          <span class="loader"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

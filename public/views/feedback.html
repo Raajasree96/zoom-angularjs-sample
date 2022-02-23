@@ -1,0 +1,22 @@
+<!-- <div brand-header></div> -->
+<div brand-header="brand-header"></div>
+<div ng-if="currentUser.length &gt; 0" class="error-page feedback">
+  <h2 class="text-center">{{currentUser}}'s feedback</h2>
+  <p class="text-center">
+
+    {{currentActivityId}} <span>[ {{teacher}} ]</span>
+  </p>
+  <div class="feedback-content">
+    <div class="row">
+      <div ng-repeat="qa in feedback.qa" class="feedback-qa-wrapper col-md-12">
+        <div style="text-align: right" class="feedback-question col-md-6">{{qa.q}}</div>
+        <div style="text-align: left" class="feedback-answer col-md-6">
+          <div><span ng-repeat="i in [1,2,3,4,5]" ng-class="{highlight: (i &lt; highlightStarIndex &amp;&amp; qa.index == highlightQuestionIndex), active: (i &lt; qa.a)}" ng-mouseover="highlightStar(qa.index, i+1)" ng-mouseout="unhighlightStar()" ng-click="selectStar(qa.index, i+1)" class="feedback-star"><i class="dc-icon dc-star"></i></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-center">
+    <button ng-click="submitFeedback()" class="btn btn-primary">Save & Submit</button>
+  </div>
+</div>

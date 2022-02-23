@@ -1,0 +1,274 @@
+<div class="title-block" ng-click="onlineMaterialListCtrl.bodyClick()">
+  <h1
+    style="
+      font-family: 'Proxima Nova Semi-bold' !important;
+      font-size: 28px;
+      color: #1a1a1a;
+      height: 34px;
+      font-weight: normal;
+    "
+  >
+    Online Classroom Materials
+  </h1>
+</div>
+
+<div class="material-preview" ng-click="onlineMaterialListCtrl.bodyClick()">
+  <div class="filter-block">
+    <div class="select-box-filters">
+      <div class="classtype-dropdown" style="position: relative; width: 300px;">
+        <div
+          class="classtype-selector"
+          ng-click="onlineMaterialListCtrl.openClasstypeList($event)"
+        >
+          <span class="selected-label">
+            {{onlineMaterialListCtrl.selectedClassType ?
+            onlineMaterialListCtrl.selectedClassType.name : 'ClassType'}}
+          </span>
+          <span class="arrow down"></span>
+        </div>
+        <div
+          class="classtype-list"
+          ng-show="onlineMaterialListCtrl.showClassTypesPanel"
+        >
+          <ul>
+            <li
+              ng-repeat="data in onlineMaterialListCtrl.onlineClassTypes"
+              ng-click="onlineMaterialListCtrl.getSelectedClassType(data)"
+              ng-class="{'selected': data.selected}"
+            >
+              <label>
+                <span
+                  class="classtype-name"
+                  ng-class="{'selected' : data.selected}"
+                  >{{ data.name }}</span
+                >
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="lesson-dropdown"
+        style="position: relative; width: 300px;"
+        ng-show="(onlineMaterialListCtrl.selectedClassType.value === 'online_l1plus') || (onlineMaterialListCtrl.selectedClassType.value === 'online_l2plus')"
+      >
+        <div
+          class="lesson-selector"
+          ng-click="onlineMaterialListCtrl.openLessons($event)"
+        >
+          <span class="selected-label">
+            {{onlineMaterialListCtrl.selectedLesson ?
+            onlineMaterialListCtrl.selectedLesson : 'Lesson'}}
+          </span>
+          <span class="arrow down"></span>
+        </div>
+        <div class="lesson-list" ng-show="onlineMaterialListCtrl.showLessons">
+          <ul>
+            <!-- <li ng-show="onlineMaterialListCtrl.type === 'L1'" ng-repeat="data in onlineMaterialListCtrl.getLessons | rangeFilter:1:4:3" ng-click="onlineMaterialListCtrl.getSelectedLesson(data)"> -->
+            <li
+              ng-show="onlineMaterialListCtrl.selectedClassType.value === 'online_l1plus'"
+              ng-repeat="data in onlineMaterialListCtrl.getLessons(1, 4)"
+              ng-click="onlineMaterialListCtrl.getSelectedLesson(data)"
+              ng-class="{'selected' : data === onlineMaterialListCtrl.selectedLesson}"
+            >
+              <label>
+                <span
+                  class="lesson-name"
+                  ng-class="{'selected' : data === onlineMaterialListCtrl.selectedLesson}"
+                  >{{ data }}</span
+                >
+              </label>
+            </li>
+            <!-- <li ng-show="onlineMaterialListCtrl.type === 'L2'" ng-repeat="data in onlineMaterialListCtrl.lessons | rangeFilter:5:8:3" ng-click="onlineMaterialListCtrl.getSelectedLesson(data)"> -->
+
+            <li
+              ng-show="onlineMaterialListCtrl.selectedClassType.value === 'online_l2plus'"
+              ng-repeat="data in onlineMaterialListCtrl.getLessons(5, 8)"
+              ng-click="onlineMaterialListCtrl.getSelectedLesson(data)"
+              ng-class="{'selected' : data === onlineMaterialListCtrl.selectedLesson}"
+            >
+              <label>
+                <span
+                  class="lesson-name"
+                  ng-class="{'selected' : data === onlineMaterialListCtrl.selectedLesson}"
+                  >{{ data }}</span
+                >
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="stage-dropdown"
+        style="position: relative; width: 300px;"
+        ng-show="(onlineMaterialListCtrl.selectedClassType.value === 'live_class') ||
+                      (onlineMaterialListCtrl.selectedClassType.value === 'online_english_corner') ||
+                      (onlineMaterialListCtrl.selectedClassType.value === 'channel_class') ||
+                      (onlineMaterialListCtrl.selectedClassType.value === 'online_complementary_class') ||
+                      (onlineMaterialListCtrl.selectedClassType.value === 'online_social_club')"
+      >
+        <div
+          class="stage-selector"
+          ng-click="onlineMaterialListCtrl.openStageList($event)"
+        >
+          <span class="selected-label">
+            {{onlineMaterialListCtrl.selectedStage ?
+            onlineMaterialListCtrl.selectedStage.name : 'Stage'}}
+          </span>
+          <span class="arrow down"></span>
+        </div>
+        <div class="stage-list" ng-show="onlineMaterialListCtrl.showStagesList">
+          <ul>
+            <li
+              ng-repeat="data in onlineMaterialListCtrl.stages"
+              ng-click="onlineMaterialListCtrl.getSelectedStage(data)"
+              ng-class="{'selected' : data.name === onlineMaterialListCtrl.selectedStage.name}"
+            >
+              <label>
+                <span
+                  class="classtype-name"
+                  ng-class="{'selected' : data.name === onlineMaterialListCtrl.selectedStage.name}"
+                  >{{ data.name }}</span
+                >
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="unit-dropdown"
+        style="position: relative; width: 300px;"
+        ng-show="onlineMaterialListCtrl.selectedClassType.value === 'online_encounter'"
+      >
+        <div
+          class="unit-selector"
+          ng-click="onlineMaterialListCtrl.openUnits($event)"
+        >
+          <span class="selected-label">
+            {{onlineMaterialListCtrl.selectedUnit ?
+            onlineMaterialListCtrl.selectedUnit : 'Unit'}}
+          </span>
+          <span class="arrow down"></span>
+        </div>
+        <div class="unit-list" ng-show="onlineMaterialListCtrl.showUnits">
+          <ul>
+            <li
+              ng-repeat="data in onlineMaterialListCtrl.units"
+              ng-click="onlineMaterialListCtrl.getSelectedUnit(data)"
+              ng-class="{'selected' : data === onlineMaterialListCtrl.selectedUnit}"
+            >
+              <label>
+                <span
+                  class="classtype-name"
+                  ng-class="{'selected' : data === onlineMaterialListCtrl.selectedUnit}"
+                  >{{ data }}</span
+                >
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="class-number-dropdown"
+        style="position: relative; width: 300px;"
+        ng-show="(onlineMaterialListCtrl.selectedClassType.value === 'online_complementary_class' && onlineMaterialListCtrl.selectedStage)"
+      >
+        <div
+          class="class-number-selector"
+          ng-click="onlineMaterialListCtrl.openClassNumberList($event)"
+        >
+          <span class="selected-label">
+            {{onlineMaterialListCtrl.selectedClassNumber ?
+            onlineMaterialListCtrl.selectedClassNumber : 'Class Number'}}
+          </span>
+          <span class="arrow down"></span>
+        </div>
+        <div
+          class="class-number-list"
+          ng-show="onlineMaterialListCtrl.showClassNumber"
+        >
+          <ul>
+            <li
+              ng-repeat="data in onlineMaterialListCtrl.classNumbers"
+              ng-click="onlineMaterialListCtrl.getSelectedClassNumber(data)"
+              ng-class="{'selected' : data === onlineMaterialListCtrl.selectedClassNumber}"
+            >
+              <label>
+                <span
+                  class="classtype-name"
+                  ng-class="{'selected' : data === onlineMaterialListCtrl.selectedClassNumber}"
+                  >{{ data }}</span
+                >
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <input
+      type="text"
+      value=""
+      class="material-search-box"
+      placeholder="Search for title"
+      ng-model="onlineMaterialListCtrl.searchValue"
+      ng-show="onlineMaterialListCtrl.selectedClassType"
+      ng-change="onlineMaterialListCtrl.debounce(onlineMaterialListCtrl.getSearchResult, 400, onlineMaterialListCtrl.searchValue)"
+    />
+
+    <!-- <input type="text" name="" value="" class="material-search-box" placeholder="search for title" ng-model="onlineMaterialListCtrl.searchValue" ng-change="onlineMaterialListCtrl.getSearchResult(onlineMaterialListCtrl.searchValue)"> -->
+  </div>
+
+  <div class="materials-block">
+    <div class="card-view" style="display: block;">
+      <div id="cover-spin" ng-if="onlineMaterialListCtrl.showloader"></div>
+
+      <div
+        class="no-results-found"
+        ng-if="onlineMaterialListCtrl.noResultsFound"
+      >
+        No Results Found
+      </div>
+
+      <div
+        class="material-card"
+        ng-if="!onlineMaterialListCtrl.noResultsFound"
+        ng-repeat="material in onlineMaterialListCtrl.onlineMaterials"
+        ng-click="onlineMaterialListCtrl.showPreview(material)"
+      >
+        <div class="material-logo">
+          <i class="dc-icon-linux-pc"></i>
+        </div>
+        <div class="material-title">
+          {{material.title ? material.title : ''}}
+        </div>
+        <div class="material-description">
+          {{material.description ? material.description : ''}}
+        </div>
+      </div>
+    </div>
+
+    <div class="tile-view" style="display: none;">
+      <div
+        class="material-tile"
+        ng-repeat="data in [1, 2, 3, 4, 5, 6, 7, 8]"
+        ng-click="onlineMaterialListCtrl.showPreview(data)"
+      >
+        <div class="material-logo">
+          <i class="dc-icon-linux-pc"></i>
+        </div>
+        <div class="material-title">
+          Title of the PPT
+        </div>
+        <div class="material-description">
+          Lorem Ipsum is simply dummy text of the printing and typesetting
+          industry.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

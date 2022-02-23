@@ -1,0 +1,78 @@
+
+<div id="modal-2" ng-class="{mdshow: showExplorer}" class="fileexplorer-wrapper md-modal md-effect-2 col-sm-8 col-lg-6">
+  <div class="md-content fileexplorer-container">
+    <div class="fileexplorer-content"><i ng-click="setErrorsToDefault();toggleExplorer();" class="dc-icon dc-close close"></i>
+      <h3>Choose a file</h3>
+      <div class="breadcrumb-holder">
+        <div class="filepath"><a href="" ng-click="fetchAllUnits(classData);"><span ng-if="classData.class == 'online_encounter'" class="root">{{classData.classTypeName}}</span></a><span ng-if="classData.class != 'online_encounter'" class="root">{{classData.classTypeName}}</span>
+          <div ng-if="viewContent != 'folder'" class="unit"><span ng-if="classData.class == 'online_encounter' &amp;&amp; classData.unit != null">> Unit &nbsp<span>{{classData.unit}}</span></span><span ng-if="classData.class != 'online_encounter' &amp;&amp; classData.stage != null">> Stage &nbsp<span>{{classData.bookedStages.toString()}}</span></span></div>
+        </div>
+      </div>
+      <div class="search-wrapper">
+        <input type="text" required="" ng-model="searchFile.name" ng-init="focusedSearch = true"/><span class="bar"></span>
+        <label>Search here...</label>
+        <!--i.dc-icon.dc-close.close(ng-click="toggleExplorer()")--><span ng-class="{'clear-search-enabled': (uploadedFiles.length &gt; 0 &amp;&amp; searchFile.name) || (searchFile.name &amp;&amp; focusedSearch) }" title="Clear the search to view all files" ng-click="searchFile.name=''" class="clear-search">clear</span>
+        <p ng-if="(uploadedFiles.length &gt; 0 &amp;&amp; searchFile.name) || (searchFile.name &amp;&amp; focusedSearch)" class="clear-search clear-search-msg">Clear the search to view all files</p>
+      </div>
+      <ul class="results">
+        <li>something</li>
+        <li>something</li>
+        <li>something</li>
+      </ul>
+      <div class="explorer-holder">
+        <div ng-if="uploadingFile.uploaded == false" ng-repeat="uploadingFile in uploadingFiles" class="recentupload filetype-dir"><i class="dc-icon dc-combined-shape"></i>
+          <p>{{uploadingFile.name}}</p>
+          <!--p.file-size{{uploadingFile.loadedSize}}kb/{{uploadingFile.file.size}}kb-->
+          <div>
+            <div class="progress-bar">
+              <div ng-style="{'width':uploadingFile.percentage.progress +'%'}" class="uploaded"></div>
+            </div>
+          </div>
+        </div>
+        <div ng-repeat="file in uploadedFiles.slice().reverse() | filter: searchFile" ng-class="{active: file.fullName == fileSelected.fullName, 'disabled' : file.showNotFound}" ng-if="uploadedFiles.length&gt;0" class="fileItems animated fadeIn">
+          <div class="fileItem">
+            <div ng-click="selectFile(file, $index)" class="filetype-dir">
+              <!--i.dc-icon.dc-combined-shape-->
+              <div class="img-container"><img ng-src="{{file.url}}"/></div>
+              <p>{{file.name}}</p><i ng-click="deleteUploadedFile(file);$event.stopPropagation();" title="Delete file" ng-if="file.canDelete" class="dc-icon dc-delete-black dc-img-delete"></i>
+            </div>
+          </div>
+        </div>
+        <div ng-repeat="folder in folders | filter:searchFile | orderBy: sortUnit" ng-class="{active: folder.uuid == fileSelected.uuid, 'disabled' : folder.showNotFound}" ng-if="viewContent == 'folder'" class="fileItems animated fadeIn">
+          <div class="fileItem">
+            <div ng-click="fetchFiles(folder);" class="filetype-folder"><i class="dc-icon dc-folder"></i>
+              <p>{{folder.name}}</p>
+            </div>
+          </div>
+        </div>
+        <div ng-repeat="ppt in ppts | filter:searchFile | orderBy: 'title'" ng-class="{active: ppt.uuid == fileSelected.uuid, 'disabled' : ppt.showNotFound}" ng-if="viewContent == 'file'" class="fileItems animated fadeIn">
+          <div class="fileItem">
+            <div ng-click="selectFile(ppt, $index)" class="filetype-ppt"><i class="dc-icon dc-powerpoint"></i>
+              <p>{{ppt.name}}</p>
+              <!--i.dc-icon.dc-delete-black.dc-img-delete-->
+              <!--div.loader-containerdiv(ng-show="node.showLoading" class="vidyo-loader")
+              -->
+              <div ng-show="node.showNotFound" class="file-missing animated fadeInRight">Sorry, the file is not available.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="action-holder"><span ng-model="files" ngf-select="uploadFiles($files)" ngf-multiple="true" ngf-pattern="image/png,image/jpg,image/jpeg" accept="image/png,image/jpg,image/jpeg" multiple="multiple" class="icon-plus"><i class="dc-icon dc-plus"></i></span>
+        <p>Upload files (JPG & PNG)</p><br/>
+        <p ng-if="fileError == 'default'" ng-class="{'upload-alert':fileError != 'default'}">File size should be below 5MB</p>
+        <p ng-if="fileError == 'maxSizeExceeded'" ng-class="{'upload-alert':fileError == 'maxSizeExceeded'}">One or more file(s) exceeded the size limit</p>
+        <p ng-if="fileError == 'maxNumberExceeded'" ng-class="{'upload-alert':fileError == 'maxNumberExceeded'}">Maximum of 5 files allowed per selection</p><br/>
+        <p ng-if="specialCharError == true" class="filetype-error">
+          <!--| File name should not contain any special characters 					-->File name should not contain '#' or '%'
+        </p>
+        <button ng-click="setErrorsToDefault();toggleExplorer();" class="md-close btn btn-default button-2">Cancel</button>
+        <button ng-click="setErrorsToDefault();importFile(fileSelected)" ng-disabled="!fileSelected.type" class="btn btn-hdr-primary button-2">Import</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div ng-class="{'overlayshow':loadFolders == false}" class="folderLoaderOverlay"></div>
+<div ng-if="loadFolders == false" class="loader_new">
+  <div class="loader">				</div>
+</div>
+<div ng-click="toggleExplorer();" class="md-overlay"></div>

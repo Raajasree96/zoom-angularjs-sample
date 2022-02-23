@@ -1,0 +1,173 @@
+
+<!--Device based menu which will show on mobile devices-->
+<div ng-if="reloadToResyncData" class="socketDisconnect">
+  <div><i class="dc-icon dc-warning"></i>
+    <p>Sync issue! </p><span>Please </span><a href="javascript:void(0)" ng-click="reloadApp();">refresh</a>
+  </div>
+</div>
+
+<div ng-if="assessmentError" class="assessmentError">
+  <div><span class="errrorIcon">
+      <p>!</p></span>
+    <p>{{assessmentError.title}}</p><i class="dc-icon dc-close"></i>
+  </div>
+</div>
+<div ng-if="assessmentSuccess" class="socketDisconnect assessment-alert">
+  <div><i class="dc-icon dc-warning">			</i>
+    <p>{{assessmentSuccess.title}}</p>
+  </div>
+</div>
+<div class="deviceheader">
+  <div class="brand"><img src="../images/img_dc_logo.png"/></div>
+  <div ng-init="toggleMenuhide=true;" ng-click="toggleMenuhide=!toggleMenuhide;" class="meanmenu"><span></span><span></span><span></span></div>
+</div>
+<div ng-class="{'menuhide':toggleMenuhide}" ng-click="toggleMenuhide=!toggleMenuhide;" class="mainmenu">
+  <ul class="leftsubnav">
+    <li disable-right-click="disable-right-click">
+      <div disable-right-click="disable-right-click" ng-click="toggleSideMenu()" title="Menu" class="meanmenu dc-icon dc-menu"></div>
+    </li>
+    <li class="device">
+      <div class="meanmenu"><span></span><span></span><span></span></div>
+    </li>
+    <li data-id="rp-header-logo"><img src="../images/img_dc_logo.png"/></li>
+  </ul>
+  <div class="toggle-subscriber-wrap">
+    <!-- toggle button subscribing to student videos -->
+    <div class="wse-toggle-button" ng-if="bandwidthStats.isStudent && rtcProvider === RTC_PROVIDER.opentok">
+      <label for="subscriber-toggle">
+        audio-only
+        <input type="checkbox" name="subscriber-toggle" id="subscriber-toggle" ng-model="isAudioOnlyModeEnabled" value="{{isAudioOnlyModeEnabled}}" ng-click="toggleAudioOnlyMode($event)">
+        <span class="wse-toggle">
+        </span>
+      </label>
+    </div>
+    <div id="toast-container" ng-if="bandwidthStats.showNotification && bandwidthStats.message.default" class="toast-container" ng-class="{'cam-below': bandwidthStats.message.secondary}">
+      <span class="toast-caret" ng-class="{'positive': bandwidthStats.messageType == 'positive', 'negative': bandwidthStats.messageType == 'negative'}"></span>
+      <div class="toast-info flyInOut" ng-class="{'positive': bandwidthStats.messageType == 'positive', 'negative': bandwidthStats.messageType == 'negative'}">
+        <button type="button" name="Close" aria-label="Close" class="toast-close-btn" ng-click="closeToast()">
+          <span aria-hidden="true">x</span>
+        </button>
+        <div class="toast-message" role="alertdialog" aria-label="{{bandwidthStats.message.default}}">
+          {{bandwidthStats.message.default}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul ng-class="{'control-disabled' : disableControls}" class="middlesubnav">
+    <li data-id="rp-header-videochat" role="presentation" ng-class="{'active':activeScreen=='avchat'}" ng-disabled="user.role=='student'" ng-click="changeActiveScreen('avchat')"><a href="javascript:void(0)">Video Chat</a></li>
+    <li data-id="rp-header-whiteboard" role="presentation" ng-class="{'active':activeScreen=='whiteboard' }" ng-disabled="user.role=='student'" ng-click="changeActiveScreen('whiteboard')"><a href="javascript:void(0)">Whiteboard</a></li>
+    <li data-id="rp-header-screenshare" role="presentation" ng-class="{'active':activeScreen=='screenshare' }" ng-disabled="user.role=='student'" ng-click="changeActiveScreen('screenshare')"><a href="javascript:void(0)">screenshare</a></li>
+  </ul>
+  <ul class="rightsubnav">
+    <li style="position: relative"><span data-id="rp-header-timer" ng-mouseover="toggleSessionNotification(true)" ng-mouseout="toggleSessionNotification(false)" class="btn-session text-center"><i class="dc-icon dc-timer"></i></span>
+      <div ng-show="showSessionNotification" class="session-notification sec-notification animated fadeIn">
+        <div class="tooltip-text">Session will end in {{ sessionRemainingTime }} minutes</div><span class="tooltip-caret"></span>
+      </div>
+    </li>
+    <li style="position: relative" ng-show="user.role === 'teacher'">
+      <span data-id="rp-header-report-icon" title="Report Issue" ng-click="toggleReportIssue()" class="teacher-issue-report-toggler">
+        <i class="dc-icon dc-report-2"></i>
+      </span>
+    </li>
+    <li style="position: relative">
+      <div class="btn-group-hide" style="display: inherit">
+        <!-- ng-click="OTS.toggleMic()" -->
+        <span data-id="rp-header-microphone"
+              disable-right-click="disable-right-click"
+              ng-attr-title="{{ user.micEnabled === true ? 'Mute':'Unmute'}}"
+              ng-click="toggleMic()"
+              ng-class="{'mute': !currentUser.micEnabled, 'unmute': currentUser.micEnabled, 'hardmute': (currentUser.micHardMuted && currentUser.joined), 'disabled': (!currentUser.micAvailable || (currentUser.micHardMuted && currentUser.joined) || !currentUser.publisherCreated || (rtcProvider === RTC_PROVIDER.zoom && !isAudioStarted ))}"
+              class="btn btn-hdr-primary tour-mute" style="line-height: 1"
+          >
+            <i ng-class="{ 'dc-mic': currentUser.micEnabled, 'dc-mic-slash': !currentUser.micEnabled }" class="dc-icon dc-mic"></i>
+        </span>
+        <div ng-show="!isAudioStarted && rtcProvider === RTC_PROVIDER.zoom" class="session-notification sec-notification animated fadeIn">
+          <div class="tooltip-text">Click here to enable the Microphone</div><span class="tooltip-caret"></span>
+        </div>
+        <span data-id="rp-header-videocam"
+              disable-right-click="disable-right-click"
+              ng-click="toggleCam(); hideCamNotification()"
+              ng-class="{'mute': (!currentUser.camEnabled || (!currentUser.camClickable && currentUser.id != teacher.id)), 'unmute': currentUser.camEnabled, 'hardmute': currentUser.camHardMuted, 'disabled': (!currentUser.camAvailable || !currentUser.publisherCreated) }"
+              ng-attr-title="{{user.camEnabled === true?'Video Turnoff':'Video Turnon'}}"
+              class="btn btn-hdr-primary tour-mute"
+              style="line-height: 1"
+        >
+            <i ng-class="{ 'dc-video': currentUser.camEnabled, 'dc-video-slash': !currentUser.camEnabled }" class="dc-icon dc-video"></i>
+        </span>
+      </div>
+
+      <div id="toast-container" ng-if="bandwidthStats.showNotification && bandwidthStats.message.secondary" class="toast-container" ng-class="{'cam-below': bandwidthStats.message.secondary}">
+        <span class="toast-caret" ng-class="{'positive': bandwidthStats.messageType == 'positive', 'negative': bandwidthStats.messageType == 'negative'}"></span>
+        <div class="toast-info flyInOut" ng-class="{'positive': bandwidthStats.messageType == 'positive', 'negative': bandwidthStats.messageType == 'negative'}">
+          <button type="button" name="Close" aria-label="Close" class="toast-close-btn" ng-click="closeToast()">
+            <span aria-hidden="true">x</span>
+          </button>
+          <div class="toast-message" role="alertdialog" aria-label="{{bandwidthStats.message.secondary}}">
+            {{bandwidthStats.message.secondary}}
+          </div>
+        </div>
+      </div>
+
+      <div ng-show="currentUser.micHardMuted && micNotification" class="session-notification sec-microphone">
+        <div class="tooltip-text">Teacher has muted you <i ng-click="hideMicNotification()" class="dc-icon dc-close pull-right m-1"></i></div><span class="tooltip-caret"></span>
+      </div>
+
+      <div ng-show="camNotification" class="session-notification sec-video">
+        <div class="tooltip-text">Turn on your camera <i ng-click="hideCamNotification()" class="dc-icon dc-close pull-right m-1"></i></div><span class="tooltip-caret"></span>
+      </div>
+    </li>
+    <li class="small-label">
+      <label>MUTE MIC</label>
+    </li>
+    <li class="small-label">
+      <label>MUTE VIDEO</label>
+    </li>
+    <li><span data-id="rp-header-chat-icon" title="Chat" ng-click="toggleChatPanel()" style="margin: 0;" class="chat-panel-trigger tour-chat"><i ng-class="{'inactive': chatBoxOpen}" class="dc-icon dc-new-chat"></i><span data-ng-bind="notificationCount > 99 ? '99+' : notificationCount" ng-if="notificationCount > 0" class="count"></span></span></li>
+    <li data-id="rp-user-account" data-target="#user-account" ng-click="toggleUserProfile()" class="user-setting tour-user"><span data-toggle="modal" title="{{user.userName | lowercase}}">
+        <!--i.dc-icon.dc-user1-->
+        <div data-id="rp-usericon" class="usericon"><img ng-src="{{user.photoUri}}" ng-show="user.photoUri &amp;&amp; user.online"/><span ng-show="!user.photoUri &amp;&amp; user.online" class="username-substring">{{(user.firstName | firstletter) + (user.lastName | firstletter)}}</span><i ng-show="!user.online" class="dc-icon dc-user-avatar"></i></div></span>
+      <div id="user-account" role="dialog" aria-labelledby="myModalLabel" data-backdrop="false" tabindex="-1" ng-blur="closeUserProfile()" ng-show="showExitPopup" disable-right-click="disable-right-click" class="user-account animated fadeIn">
+        <div class="userdisplay">
+          <div data-id="rp-usericon" class="usericon"><img ng-src="{{user.photoUri}}" ng-show="user.photoUri &amp;&amp; user.online"/>
+            <!--i.dc-icon.dc-user1(ng-show="!user.photoUri")--><span ng-show="!user.photoUri &amp;&amp; user.online" class="username-substring">{{(user.firstName | firstletter) + (user.lastName | firstletter)}}</span><i ng-show="!user.online" class="dc-icon dc-user-avatar"></i>
+          </div>
+          <div class="userdetails">
+            <h5 ng-bind="user.userName | characters:15 | lowercase : false" data-id="rp-username"></h5>
+            <p><span style="cursor: pointer" ng-click="toggleDiagnosticPopup(); closeUserProfile();" data-id="rp-usersettings">Settings</span></p>
+          </div>
+        </div>
+        <div class="userbuttons">
+          <button type="button" data-dismiss="modal" ng-click="endSession();" ng-if="user.role=='teacher'" data-id="rp-end-session" disable-right-click="disable-right-click" class="btn btn-sm btn-primary">END SESSION          	</button>
+          <button type="button" data-dismiss="modal" ng-click="exitApp();" data-id="rp-logout" disable-right-click="disable-right-click" class="btn btn-sm btn-primary">LOGOUT</button>
+        </div>
+      </div>
+    </li>
+    <!-- <li>
+      <span data-id="rp-header-report-icon" title="ReportIssue" ng-click="toggleReportIssue()" style="margin: 0;">
+        <i class="dc-icon dc-new-chat"></i>
+      </span>
+    </li> -->
+    <li><span role="presentation" ng-class="{'active':activeScreen=='avchat'}" ng-disabled="user.role=='student'" ng-click="changeActiveScreen('avchat')"><a href="javascript:void(0)"><i class="dc-icon dc-video"></i></a></span></li>
+    <li><span role="presentation" ng-class="{'active':activeScreen=='whiteboard' }" ng-disabled="user.role=='student'" ng-click="changeActiveScreen('whiteboard')"><a href="javascript:void(0)"><i class="dc-icon dc-white-board"></i></a></span></li>
+  </ul>
+</div>
+<div id="side-menu" ng-show="showSideMenu" tabIndex="-1" ng-blur="closeSideMenu()" ng-class="{'menuhide':toggleMenuhide}" ng-click="toggleMenuhide=!toggleMenuhide;" class="list-group col-md-3 col-xs-6 col-sm-4">
+  <ul>
+    <li class="list-group-item" data-id="rp-side-menu-mute" disable-right-click data-dismiss="modal" ng-click="toggleMuteAll()" ng-if="user.role == 'teacher'">
+      <span ng-class="{ 'dc-mic': muteAll, 'dc-mic-slash': !muteAll }" class="dc-icon"></span>
+      <span>{{ muteAll ? 'Unmute All' : 'Mute All' }}</span>
+    </li>
+    <li data-id="rp-side-menu-ps" disable-right-click data-dismiss="modal" ng-click="togglePrivilegePopup()" ng-if="user.role == 'teacher'" ng-show="activeScreen!='avchat' &amp;&amp; activeScreen!='screenshare' &amp;&amp; !privilegeDisabled" class="list-group-item"><span class="dc-icon dc-pencil"></span><span>Privilege Sharing</span></li>
+    <li data-id="rp-side-menu-breakout" disable-right-click data-dismiss="modal" ng-click="toggleBreakoutPopup()" ng-if="user.role == 'teacher' && rtcProvider === RTC_PROVIDER.opentok" ng-show="activeScreen=='whiteboard' &amp;&amp; !breakoutDisabled" class="list-group-item"><span class="dc-icon dc-breakout"></span><span>Breakout</span></li>
+    <li data-id="rp-side-menu-tt" disable-right-click data-dismiss="modal" ng-click="startTour()" ng-if="user.role == 'student'" class="list-group-item"><span class="dc-icon dc-tour"></span><span>Take a tour</span></li>
+  </ul>
+  <div class="sidemenu-footer">
+    <ul>
+      <li><span ng-mousedown="toggleCmsPopup('terms-and-condition');">Terms and Conditions</span></li>
+      <li><span ng-mousedown="toggleCmsPopup('privacy-policy');">Privacy Policy</span></li>
+      <li> <span ng-mousedown="toggleCmsPopup('cookie-policy');">Cookie Policy</span></li>
+      <li><span> &copy; Copyright WSE Hong Kong Limited</span></li>
+    </ul>
+  </div>
+</div>

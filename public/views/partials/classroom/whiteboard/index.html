@@ -1,0 +1,76 @@
+
+<wb-toolbar></wb-toolbar>
+<wb-fileexplorer></wb-fileexplorer>
+<wb-privilege></wb-privilege>
+<wb-board></wb-board>
+<wb-breakout></wb-breakout>
+<!-- This is just for users service testing, do not delete-->
+<!--div.row
+table.table.table-condensed.table-bordered(style="position: fixed; left:50; top:120; width:50%; background: #fff; border: 5px solid #666")
+	tr
+		th User Id
+		th User Role
+		th Online
+		th Joined
+	tr(ng-repeat="user in masterUsers")
+		td {{user.id}}
+		td {{user.role}}
+		td {{user.online}}
+		td {{user.joined}}
+
+-->
+<!--section.participant-panel
+ul(ng-if="user.role == 'student'")
+	li.participant(ng-repeat="participant in participants", title="{{participant.name}}")
+		div.participant-status(ng-class="{active : participant.name == pinnedUser.username}")
+			video(poster="{{participant.pic}}")
+			div.student-offline
+		div(href="#", class="btn btn-link btn-sm mic participant-notification", ng-click="")
+			span.participant-notification-space {{participant.name}}
+			// span.participant-notification-space {{participant.userstatus | lowercase}}
+		a(href="#", class="btn btn-link btn-sm mic", ng-if="participant.name == user.username" ng-click="toggleMic(participant)")
+			span.dc-icon.dc-mic(ng-if="participant.audio")
+			span.dc-icon.dc-mic-slash(ng-if="!participant.audio")
+		div.btn.more(ng-if="participant.name == user.username")
+			a(href="#", class="btn btn-link btn-sm video", ng-click="toggleVideo(participant)")
+				span.dc-icon.dc-video(ng-if="participant.video")
+				span.dc-icon.dc-video-slash(ng-if="!participant.video")
+		//a.btn.btn-link.btn-sm.more(href="#", ng-if="user.role == 'teacher'")
+			span.fa.fa-angle-down
+		ul
+			li
+				a(href="#") Make Editor
+			li
+				a(href="#") Block User
+			li
+				{{participant.userstatus}}
+		div.progress
+			div.progress-bar.progress-bar-success(role="progressbar", data-transitiongoal-backup="40", data-transitiongoal="40", aria-valuenow="40", style="width: {{user.progress}}%;")
+ul(ng-if="user.role == 'teacher'")
+	li.participant(ng-repeat="participant in participants", title="{{participant.name}}")
+		div.participant-status(ng-class="{active : participant.name == pinnedUser.username}")
+			video(poster="{{participant.pic}}", ng-click="pinUser(participant)")
+			div.student-offline
+			div.speaker.animated(ng-click="pinUser(participant)", ng-class="{fadeIn : participant.name == pinnedUser.username, fadeOut : participant.name != pinnedUser.username}")
+		div(href="#", class="btn btn-link btn-sm mic participant-notification", ng-click="")
+			span.participant-notification-space {{participant.name}}
+			// span.participant-notification-space {{participant.userstatus | lowercase}}
+		a(href="#", class="btn btn-link btn-sm mic", ng-click="toggleMic(participant)")
+			span.dc-icon.dc-mic(ng-if="participant.audio")
+			span.dc-icon.dc-mic-slash(ng-if="!participant.audio")
+		div.btn.more
+			a(href="#", class="btn btn-link btn-sm video", ng-click="toggleVideo(participant)")
+				span.dc-icon.dc-video(ng-if="participant.video")
+				span.dc-icon.dc-video-slash(ng-if="!participant.video")
+		// a.btn.btn-link.btn-sm.more(href="#", ng-if="user.role == 'teacher'")
+			span.fa.fa-angle-down
+		ul
+			li
+				a(href="#") Make Editor
+			li
+				a(href="#") Block User
+			li
+				{{participant.userstatus}}
+		div.progress
+			div.progress-bar.progress-bar-success(role="progressbar", data-transitiongoal-backup="40", data-transitiongoal="40", aria-valuenow="40", style="width: {{user.progress}}%;")
+-->

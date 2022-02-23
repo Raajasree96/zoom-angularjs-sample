@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,oBAAoB,CAChB,MAAM,CAAC,IAAI,CACX,4CAAuB,CACnB,MAAM,CAAC,IAAI,CACX,wDAAW,CACP,OAAO,CAAE,CAAC,CACV,MAAM,CAAE,IAAI,CACZ,mEAAa,CACT,OAAO,CAAE,IAAI,CAEjB,oEAAY,CACR,MAAM,CAAE,eAAe,CACvB,KAAK,CAAE,eAAe,CACtB,UAAU,CAAE,gBAAgB,CAE5B,aAAa,CAAE,GAAG,CAClB,qBAAqB,CAAE,GAAG",
+"sources": ["../../app/styles/screenshare.scss"],
+"names": [],
+"file": "screenshare.css"
+}

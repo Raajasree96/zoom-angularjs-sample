@@ -1,0 +1,109 @@
+
+<div class="overlay" ng-class="{'show-overlay': toggleReportCanvas}" ng-click="closeReportCanvas()"></div>
+
+<div class="session-issue-report-container" ng-class="{'show-report': toggleReportCanvas}" ng-click="clickedOnPage()">
+
+  <div class="col-sm-6 col-xs-8 report-container" direction="right" role="document" tabindex="-1" ng-class="{'show-report-form' : toggleReportCanvas}">
+    <i class="dc-icon dc-close" ng-click="closeReportCanvas()" style="cursor: pointer">
+    </i>
+
+    <div style="padding: 80px 50px" ng-show="!issue.reportSubmitted">
+       <div>
+          <h1 class="report-title">Report an issue</h1>
+       </div>
+       <hr />
+        <div class="participant-dropdown">
+          <div class="title" ng-click="openParticipantList()" ng-class="{'highlight': issue.showParticipants}">
+            <span>Person Impacted
+              <span ng-show="issue.selectedParticipant.length == 0" class="mandatory-field-indicator">*</span>
+               <span ng-show="issue.selectedParticipant.length > 0">({{issue.selectedParticipant.length}})</span>
+            </span>
+            <span class="arrow down"></span>
+          </div>
+          <div class="participants-list" ng-show="issue.showParticipants">
+                <ul>
+                  <li ng-repeat="value in issue.allParticipants | orderBy : ['role', 'firstName']" ng-click="getSelectedParticipant(value)">
+                    <label ng-show="value.role === 'student'">
+                      <span class="participant-name" ng-class="{'selected' : value.selected}">{{ value.firstName + ' ' + value.lastName }}</span>
+                    </label>
+                    <label ng-show="value.role === 'teacher'">
+                      <span class="participant-name" ng-class="{'selected' : value.selected}">Teacher</span>
+                    </label>
+                  </li>
+                </ul>
+          </div>
+        </div>
+
+        <!-- Temporarily commented - it is needed later -->
+
+        <!-- <div class="issue-type-dropdown">
+          <div class="title" ng-click="openPredefinedIssues()">
+            <span>{{selectedIssue ? selectedIssue : 'Issue Details'}}</span>
+            <span class="arrow down"></span>
+          </div>
+          <div class="issues-list" ng-show="showPredefinedIssues">
+                <ul>
+                  <li ng-click="getSelectedIssue()">Issue 1</li>
+                  <li ng-click="getSelectedIssue()">Issue 2</li>
+                  <li ng-click="getSelectedIssue()">Issue 3</li>
+                  <li ng-click="getSelectedIssue()">Issue 4</li>
+                  <li ng-click="getSelectedIssue()">Issue 5</li>
+                  <li ng-click="getSelectedIssue()">Issue 6</li>
+                </ul>
+          </div>
+        </div> -->
+
+        <div class="other-issue-container">
+          <textarea name="other-issues"
+                    Placeholder="Describe the issue"
+                    rows="4"
+                    maxlength="300"
+                    ng-model="issue.issuesStatedByTeacher"
+                    ng-change="hideValidationMessage()"
+                    class="issue-text-box"
+                    ng-class="{'alert-line': issue.issuesStatedByTeacher.length < 1}">
+          </textarea>
+          <div style="text-align: right" ng-show="issue.issuesStatedByTeacher">
+            <b>{{issue.issuesStatedByTeacher.length}}</b> of <b>300</b>
+          </div>
+          <div class="warning-area" ng-show="issue.showValidationError">
+            <label for="other-issues" class="validation-error-message">Field is required</label>
+            <i class="dc-warning"></i>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="action-buttons">
+          <button type="button" name="cancel-button" class="cancel" ng-click="closeReportCanvas()">Cancel</button>
+          <button type="button" name="submit-issue" class="issue-submit" ng-click="submitIssueDetails()">Submit</button>
+        </div>
+    </div>
+
+    <div class="report-submit-view" ng-show="issue.reportSubmitted">
+      <div class="verified-icon-container">
+        <i class="dc-icon dc-verified" ng-click="closeReportCanvas()" style="cursor: pointer">
+        </i>
+      </div>
+
+      <h1>Thanks for registering an issue</h1>
+
+      <div class="issues-created-confitmation-text">
+        <div>Your issue has been registered successfully</div>
+        <div>It will be resolved as soon as possible.</div>
+      </div>
+
+      <div class="action-buttons">
+        <button type="button" name="submit-issue" class="issue-submit" ng-click="submitAnotherIssue()">Report Another Issue</button>
+        <button type="button" name="submit-issue" class="issue-submit" ng-click="closeReportCanvas()">Close</button>
+      </div>
+    </div>
+
+    <div class="loader-container" ng-show="issueGettingSubmitted">
+      <div class="progress">
+        <div class="progressbar"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
