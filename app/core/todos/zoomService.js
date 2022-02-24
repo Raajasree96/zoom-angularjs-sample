@@ -194,45 +194,45 @@
                 vm.addedParticipants.forEach((participant) => {
                     console.log('participant', participant)
                     // for single canvas
-                    const otherCanvas = document.getElementById('video-canvas-other');
-                    vm.updatedIndex = sortedStudentList.findIndex(student => student.userId == participant.userId)
-                    console.log('vm.sortedStudentList', sortedStudentList)
-                    console.log('vm.updatedIndex', vm.updatedIndex)
-                    vm.mediaStream.renderVideo(otherCanvas, participant.userId, 300, 100, 300 * vm.updatedIndex, 0, 1);
+                    // const otherCanvas = document.getElementById('video-canvas-other');
+                    // vm.updatedIndex = sortedStudentList.findIndex(student => student.userId == participant.userId)
+                    // console.log('vm.sortedStudentList', sortedStudentList)
+                    // console.log('vm.updatedIndex', vm.updatedIndex)
+                    // vm.mediaStream.renderVideo(otherCanvas, participant.userId, 300, 100, 300 * vm.updatedIndex, 0, 1);
 
                     // for multi canvas
-                    // if (participant.isHost) {
-                    //     const canvas = document.getElementById('video-canvas-teacher');
-                    //     vm.mediaStream.renderVideo(canvas, participant.userId, 300, 100, 0, 0, 1);
-                    // } else {
-                    //     const otherCanvas = document.getElementById('video-canvas-other');
-                    //     vm.updatedIndex = sortedStudentList.findIndex(student => student.userId == participant.userId)
-                    //     console.log('vm.sortedStudentList', sortedStudentList)
-                    //     console.log('vm.updatedIndex', vm.updatedIndex)
-                    //     vm.mediaStream.renderVideo(otherCanvas, participant.userId, 300, 100, 300 * vm.updatedIndex, 0, 1);
-                    // }
+                    if (participant.isHost) {
+                        const canvas = document.getElementById('video-canvas-teacher');
+                        vm.mediaStream.renderVideo(canvas, participant.userId, 300, 100, 0, 0, 1);
+                    } else {
+                        const otherCanvas = document.getElementById('video-canvas-other');
+                        vm.updatedIndex = sortedStudentList.findIndex(student => student.userId == participant.userId)
+                        console.log('vm.sortedStudentList', sortedStudentList)
+                        console.log('vm.updatedIndex', vm.updatedIndex)
+                        vm.mediaStream.renderVideo(otherCanvas, participant.userId, 300, 100, 300 * vm.updatedIndex, 0, 1);
+                    }
                 });
             }
             // removedParticipants
             if (vm.removedParticipants.length > 0) {
                 vm.removedParticipants.forEach((participant) => {
                     // for single canvas
-                    vm.mediaStream && vm.mediaStream.stopRenderVideo(
-                        document.getElementById('video-canvas-teacher'),
-                        participant.userId,
-                    );
+                    // vm.mediaStream && vm.mediaStream.stopRenderVideo(
+                    //     document.getElementById('video-canvas-teacher'),
+                    //     participant.userId,
+                    // );
                     // For multi canvas
-                    // if (participant.isHost) {
-                    //     vm.mediaStream && vm.mediaStream.stopRenderVideo(
-                    //         document.getElementById('video-canvas-teacher'),
-                    //         participant.userId,
-                    //     );
-                    // } else {
-                    //     vm.mediaStream && vm.mediaStream.stopRenderVideo(
-                    //         document.getElementById('video-canvas-other'),
-                    //         participant.userId,
-                    //     );
-                    // }
+                    if (participant.isHost) {
+                        vm.mediaStream && vm.mediaStream.stopRenderVideo(
+                            document.getElementById('video-canvas-teacher'),
+                            participant.userId,
+                        );
+                    } else {
+                        vm.mediaStream && vm.mediaStream.stopRenderVideo(
+                            document.getElementById('video-canvas-other'),
+                            participant.userId,
+                        );
+                    }
                 });
             }            
         }
